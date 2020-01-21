@@ -578,7 +578,8 @@ async function queryLeaveHistory(req, res) {
         let user = listUser.find((datauser) => { return datauser.userId === '' + `${data_user}`; })
         let model = {
             id: `${data_user}`,
-            name: user.name
+            name: user.name,
+            typeUser: user.statusWorking
         }
         list_send.push(model)
      })
@@ -622,7 +623,8 @@ async function queryLeaveHistory(req, res) {
             let user = listUser.find((datauser) => { return datauser.userId === '' + `${data_user}`; })
             let model = {
                 id: `${data_user}`,
-                name: user.name
+                name: user.name,
+                typeUser: user.statusWorking
             }
             list_send.push(model)
          })

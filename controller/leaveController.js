@@ -338,7 +338,9 @@ async function removeLeaveRequestFormEmail(req, res) {
             res.send(false);
         }
     } else {
-        res.send("ดำเนินการไม่สำเร็จเนื่องจากได้รับการอนุมัติเรียบร้อยแล้ว")
+        res.send("<script type='text/javascript'> " +
+                    "  document.write('Can not Reject because Admin or Super admin Approved!'); setTimeout(function(){  window.close() }, 5000) " +
+                    "</script>");
     }
 }
 
@@ -412,7 +414,8 @@ async function updateStatusLeaveRequestFromEmail(req, res) {
     let m = manager[0]
 
     rowDatas.forEach(element => {
-        try {
+        if(element.status === "") {
+            try {
             element.status = 'อนุมัติ';
             element.admin_approve = '' + datamenager[0].userid;
             element.save();
@@ -422,8 +425,13 @@ async function updateStatusLeaveRequestFromEmail(req, res) {
             res.send("<script type='text/javascript'> " +
                 "  document.write('Approved!'); setTimeout(function(){  window.close() }, 5000) " +
                 "</script>");
-        } catch{
+            }catch {
             res.send(false);
+            } 
+        }else{
+            res.send("<script type='text/javascript'> " +
+                "  document.write('Can not approve because Admin or Super admin Approved!'); setTimeout(function(){  window.close() }, 5000) " +
+                "</script>");
         }
     });
 }

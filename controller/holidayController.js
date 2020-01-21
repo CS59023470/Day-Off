@@ -50,6 +50,12 @@ function checkExpDateEnd(rowDatas) {
                 data_remove: data
             }
             row_remove.push(model)
+        }else if (data.amountday <= 0) {
+            let model = {
+                index: i,
+                data_remove: data
+            }
+            row_remove.push(model)
         }
     })
     return row_remove

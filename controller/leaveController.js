@@ -104,7 +104,7 @@ async function queryAllLeaveRequestNotApprove(req, res) {
     const sheet = info.worksheets[sheet_api.indexSheetLeave];
     const listUser = await user_api.queryAllUser();
     const rowDatas = await promisify(sheet.getRows)({
-        query: 'status = ""'
+        query: 'status = "" & idemployee != '+ req.body.data.userid
     });
 
     let setUser = rowDatas.map((res) => {
@@ -155,19 +155,16 @@ async function queryLeaveRequestNotApproveForAdmin(req, res) {
     })
 
     const rowDatas = await promisify(sheet.getRows)({
-        query: 'status = ""'
+        query: 'status = "" & idemployee != '+ req.body.data.userid
     });
 
     let list_result_return = []
 
     rowDatas.forEach(leave => {
-
         list_under.forEach(filteruser => {
-
             if (filteruser.underid === leave.idemployee) {
                 list_result_return.push(leave)
             }
-
         })
     })
 
@@ -184,8 +181,6 @@ async function queryLeaveRequestNotApproveForAdmin(req, res) {
             usedayoff: res.usedayoff,
             usespecialholiday: res.usespecialholiday,
             user: listUser.find((datauser) => { return datauser.userId === '' + res.idemployee; }),
-
-
         }
     });
 
@@ -285,6 +280,7 @@ async function removeLeaveRequest(req, res) {
             if (result_update_user === true) {
                 rowDatas[0].del();
                 mail.mailRejected(rowDatas[0], u, m);
+                res.send(true);
             } else {
                 res.send(false);
             }
@@ -372,10 +368,11 @@ async function updateStatusLeaveRequest(req, res) {
     rowDatas.forEach(element => {
         try {
             element.status = 'อนุมัติ';
-            element.admin_approve = '' + manager;
+            element.admin_approve = '' + manager[0].userid;
             element.save();
             mail.mailApproved(rowDatas[0], u, m);
             holiday.decreaseAmountDay(rowDatas[0]);
+            res.send(true);
         } catch{
             res.send(false);
         }

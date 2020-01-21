@@ -22,7 +22,6 @@ router.get('/queryAllUser',sheet_user.queryAllUser)
 router.get('/queryDayLeft/:id',sheet_user.queryDayLeft)
 router.get('/queryAllUserforSearch/',sheet_user.queryAllUserforSearch)
 
-
 //-- Day Off Controller
 router.get('/queryAllDayOff',sheet_day_off.quryAllDayOff)
 
@@ -32,19 +31,15 @@ router.get('/allLeaveRequestApprove',sheet_leave.queryAllLeaveRequestApprove)
 router.get('/updateLeaveRequest/:id/:idManager',sheet_leave.updateStatusLeaveRequest)
 router.get('/removeLeaveRequest/:id/:idManager',sheet_leave.removeLeaveRequest)
 router.post('/historyallbymonth',sheet_leave.queryHistoryLeaveByMonth)
-router.get('/allLeaveRequestNotApprove',sheet_leave.queryAllLeaveRequestNotApprove)
+router.post('/allLeaveRequestNotApprove',sheet_leave.queryAllLeaveRequestNotApprove)
 router.post('/leaveRequestForAdmin',sheet_leave.queryLeaveRequestNotApproveForAdmin)
 router.get('/historyallbyid/:id',sheet_leave.queryHistoryLeaveByID)
 router.get('/queryforcalendar',sheet_leave.queryForCalendar)
-router.get('/historyall',sheet_leave.queryLeaveHistory)
-
+router.post('/historyall',sheet_leave.queryLeaveHistory)
 
 //-- Email Controller
 router.get('/updateLeaveRequestFromEmail/:id/:emailManager',sheet_leave.updateStatusLeaveRequestFromEmail)
 router.get('/removeLeaveRequestFromEmail/:id/:emailManager',sheet_leave.removeLeaveRequestFormEmail)
-
-
-
 
 //-- Weekend Controller
 router.get('/allWeekend',sheet_weekend.queryAllWeekend)

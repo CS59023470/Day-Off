@@ -304,43 +304,50 @@ async function removeLeaveRequestFormEmail(req, res) {
         query: 'rowid = ' + req.params.id
     });
 
-    const user = await promisify(sheetUsers.getRows)({
-        query: 'userid = ' + rowDatas[0].idemployee
-    });
+    if(rowDatas.length === 0) {
+        res.render('datanotfound')
 
-    const manager = await promisify(sheetUsers.getRows)({
-        query: 'email = "' + req.params.emailManager + '"'
-    });
-
-    let u = user[0]
-    let m = manager[0]
-
-    if (rowDatas[0].status === "") {
-        try {
-            let modelRowLeave = {
-                userid: rowDatas[0].idemployee,
-                type: rowDatas[0].type,
-                usedayoff: Number(rowDatas[0].usedayoff),
-                usespecialholiday: Number(rowDatas[0].usespecialholiday)
-            }
-
-            let result_update_user = await user_api.updateDayleaveWhenReject(modelRowLeave)
-            if (result_update_user === true) {
-                rowDatas[0].del();
-                mail.mailRejected(rowDatas[0], u, m);
-                res.send("<script type='text/javascript'> " +
-                    "  document.write('Rejected!'); setTimeout(function(){  window.close() }, 5000) " +
-                    "</script>");
-            } else {
-                res.send(false);
-            }
-        } catch{
-            res.send(false);
-        }
     } else {
-        res.send("<script type='text/javascript'> " +
-                    "  document.write('Can not Reject because Admin or Super admin Approved!'); setTimeout(function(){  window.close() }, 5000) " +
-                    "</script>");
+
+        
+        
+
+        if(rowDatas[0].status === ""){
+
+            const user = await promisify(sheetUsers.getRows)({
+                query: 'userid = ' + rowDatas[0].idemployee
+            });
+        
+            const manager = await promisify(sheetUsers.getRows)({
+                query: 'email = "' + req.params.emailManager + '"'
+            });
+        
+            let u = user[0]
+            let m = manager[0]
+
+            try {
+                let modelRowLeave = {
+                    userid: rowDatas[0].idemployee,
+                    type: rowDatas[0].type,
+                    usedayoff: Number(rowDatas[0].usedayoff),
+                    usespecialholiday: Number(rowDatas[0].usespecialholiday)
+                }
+    
+                let result_update_user = await user_api.updateDayleaveWhenReject(modelRowLeave)
+                if (result_update_user === true) {
+                    rowDatas[0].del();
+                    mail.mailRejected(rowDatas[0], u, m);
+                    res.render('reject')
+                } else {
+                    res.render('systemerror')
+                }
+            } catch{
+                res.render('systemerror')
+            }   
+       
+        }else{
+            res.render('cannotreject')
+        }
     }
 }
 
@@ -391,6 +398,10 @@ async function updateStatusLeaveRequestFromEmail(req, res) {
 
     let datamenager = {}
 
+    const rowDatas = await promisify(sheetLeave.getRows)({
+        query: 'rowid = ' + req.params.id
+    });
+
     const manager = await promisify(sheetUsers.getRows)({
         query: 'email = "' + req.params.emailManager + '"'
     });
@@ -401,14 +412,9 @@ async function updateStatusLeaveRequestFromEmail(req, res) {
         }
     })
 
-    const rowDatas = await promisify(sheetLeave.getRows)({
-        query: 'rowid = ' + req.params.id
-    });
-
     const user = await promisify(sheetUsers.getRows)({
         query: 'userid = ' + rowDatas[0].idemployee
     });
-    //dd
 
     let u = user[0]
     let m = manager[0]
@@ -421,17 +427,12 @@ async function updateStatusLeaveRequestFromEmail(req, res) {
             element.save();
             mail.mailApproved(rowDatas[0], u, m);
             holiday.decreaseAmountDay(rowDatas[0]);
-            //a
-            res.send("<script type='text/javascript'> " +
-                "  document.write('Approved!'); setTimeout(function(){  window.close() }, 5000) " +
-                "</script>");
+            res.render('approve')
             }catch {
             res.send(false);
             } 
         }else{
-            res.send("<script type='text/javascript'> " +
-                "  document.write('Can not approve because Admin or Super admin Approved!'); setTimeout(function(){  window.close() }, 5000) " +
-                "</script>");
+            res.render('cannotapprove')
         }
     });
 }

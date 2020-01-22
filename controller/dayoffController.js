@@ -69,7 +69,7 @@ async function quryAllDayOffForcalendar(req, res){
             let date2 = new Date(Date.UTC(dateStart.getFullYear(), dateStart.getMonth(), dateStart.getDate(), 0, 0, 0));
             let date3 = new Date(Date.UTC(dateEnd.getFullYear(), dateEnd.getMonth(), dateEnd.getDate(), 23, 59, 59));
             let dataDayOff1 = {
-                id : 'WE',
+                id : 'HD',
                 startdate : date2,
                 enddate : date3,
                 title : data.description,

@@ -244,11 +244,77 @@ async function queryAllLeaveRequestApprove(req, res) {
     res.send(JSON.stringify(resultData));
 }
 
-//API ลบรายการขอลากิจ ที่ไม่ได้รับการอนุมัติ จากเว็บไซต์
+//API ลบรายการขอลา จากเว็บไซต์
 async function removeLeaveRequest(req, res) {
     const doc = new GoogleSpreadsheet(sheet_api.sheetId);
     await promisify(doc.useServiceAccountAuth)(creds);
     const info = await promisify(doc.getInfo)();
+    const model_send = {
+        status: null,
+        description: ''
+    }
+    const sheetLeave = info.worksheets[sheet_api.indexSheetLeave];
+    const sheetUsers = info.worksheets[sheet_api.indexSheetUser];
+
+    const rowDatas = await promisify(sheetLeave.getRows)({
+        query: 'rowid = ' + req.params.id
+    });
+    
+    if(rowDatas.length > 0){
+        if(rowDatas[0].status === ""){
+            const user = await promisify(sheetUsers.getRows)({
+                query: 'userid = ' + rowDatas[0].idemployee
+            });
+            const manager = await promisify(sheetUsers.getRows)({
+                query: 'userid = ' + req.params.idManager
+            });
+            let u = user[0]
+            let m = manager[0]
+            try {
+                let modelRowLeave = {
+                    userid: rowDatas[0].idemployee,
+                    type: rowDatas[0].type,
+                    usedayoff: Number(rowDatas[0].usedayoff),
+                    usespecialholiday: Number(rowDatas[0].usespecialholiday)
+                }
+                let result_update_user = await user_api.updateDayleaveWhenReject(modelRowLeave)
+                if (result_update_user === true) {
+                    rowDatas[0].del();
+                    mail.mailRejected(rowDatas[0], u, m);
+                    model_send.status = true
+                    model_send.description = 'successfully'
+                    res.send(JSON.stringify(model_send))
+                } else {
+                    model_send.status = false
+                    model_send.description = 'system_error'
+                    res.send(JSON.stringify(model_send))
+                }
+            } catch{
+                model_send.status = false
+                model_send.description = 'system_error'
+                res.send(JSON.stringify(model_send))
+            }
+        }else{
+            model_send.status = false
+            model_send.description = 'approved'
+            res.send(JSON.stringify(model_send))
+        }
+    }else{
+        model_send.status = false
+        model_send.description = 'not_found'
+        res.send(JSON.stringify(model_send))
+    }
+}
+
+//API อนุมัติการขอลา จากเว็บไซต์
+async function updateStatusLeaveRequest(req, res) {
+    const doc = new GoogleSpreadsheet(sheet_api.sheetId);
+    await promisify(doc.useServiceAccountAuth)(creds);
+    const info = await promisify(doc.getInfo)();
+    const model_send = {
+        status: null,
+        description: ''
+    }
     const sheetLeave = info.worksheets[sheet_api.indexSheetLeave];
     const sheetUsers = info.worksheets[sheet_api.indexSheetUser];
 
@@ -256,39 +322,41 @@ async function removeLeaveRequest(req, res) {
         query: 'rowid = ' + req.params.id
     });
 
-    const user = await promisify(sheetUsers.getRows)({
-        query: 'userid = ' + rowDatas[0].idemployee
-    });
-
-    const manager = await promisify(sheetUsers.getRows)({
-        query: 'userid = ' + req.params.idManager
-    });
-
-    let u = user[0]
-    let m = manager[0]
-
-    if (rowDatas[0].status === "") {
-        try {
-            let modelRowLeave = {
-                userid: rowDatas[0].idemployee,
-                type: rowDatas[0].type,
-                usedayoff: Number(rowDatas[0].usedayoff),
-                usespecialholiday: Number(rowDatas[0].usespecialholiday)
-            }
-
-            let result_update_user = await user_api.updateDayleaveWhenReject(modelRowLeave)
-            if (result_update_user === true) {
-                rowDatas[0].del();
-                mail.mailRejected(rowDatas[0], u, m);
-                res.send(true);
-            } else {
-                res.send(false);
-            }
-        } catch{
-            res.send(false);
+    if(rowDatas.length > 0){
+        if(rowDatas[0].status === ""){
+            const manager = await promisify(sheetUsers.getRows)({
+                query: 'userid = ' + req.params.idManager
+            });
+            const user = await promisify(sheetUsers.getRows)({
+                query: 'userid = ' + rowDatas[0].idemployee
+            });
+            let u = user[0]
+            let m = manager[0]
+            rowDatas.forEach(element => {
+                try {
+                    element.status = 'อนุมัติ';
+                    element.admin_approve = '' + manager[0].userid;
+                    element.save();
+                    mail.mailApproved(rowDatas[0], u, m);
+                    holiday.decreaseAmountDay(rowDatas[0]);
+                    model_send.status = true
+                    model_send.description = 'successfully'
+                    res.send(JSON.stringify(model_send))
+                } catch{
+                    model_send.status = false
+                    model_send.description = 'system_error'
+                    res.send(JSON.stringify(model_send))
+                }
+            });
+        }else{
+            model_send.status = false
+            model_send.description = 'approved'
+            res.send(JSON.stringify(model_send))
         }
-    } else {
-        res.send(false)
+    }else{
+        model_send.status = false
+        model_send.description = 'not_found'
+        res.send(JSON.stringify(model_send))
     }
 }
 
@@ -351,43 +419,6 @@ async function removeLeaveRequestFormEmail(req, res) {
     }
 }
 
-//API อัพเดทสถานะการขอลากิจ ที่ได้รับการอนุมัติ จากเว็บไซต์
-async function updateStatusLeaveRequest(req, res) {
-    const doc = new GoogleSpreadsheet(sheet_api.sheetId);
-    await promisify(doc.useServiceAccountAuth)(creds);
-    const info = await promisify(doc.getInfo)();
-    const sheetLeave = info.worksheets[sheet_api.indexSheetLeave];
-    const sheetUsers = info.worksheets[sheet_api.indexSheetUser];
-
-    const manager = await promisify(sheetUsers.getRows)({
-        query: 'userid = ' + req.params.idManager
-    });
-
-    const rowDatas = await promisify(sheetLeave.getRows)({
-        query: 'rowid = ' + req.params.id
-    });
-
-    const user = await promisify(sheetUsers.getRows)({
-        query: 'userid = ' + rowDatas[0].idemployee
-    });
-
-    let u = user[0]
-    let m = manager[0]
-
-    rowDatas.forEach(element => {
-        try {
-            element.status = 'อนุมัติ';
-            element.admin_approve = '' + manager[0].userid;
-            element.save();
-            mail.mailApproved(rowDatas[0], u, m);
-            holiday.decreaseAmountDay(rowDatas[0]);
-            res.send(true);
-        } catch{
-            res.send(false);
-        }
-    });
-}
-
 //API อัพเดทสถานะการขอลากิจ ที่ได้รับการอนุมัติ จากอีเมล
 async function updateStatusLeaveRequestFromEmail(req, res) {
     const doc = new GoogleSpreadsheet(sheet_api.sheetId);
@@ -440,23 +471,6 @@ async function updateStatusLeaveRequestFromEmail(req, res) {
             }
         });
     }
-
-    /*rowDatas.forEach(element => {
-        if(element.status === "") {
-            try {
-            element.status = 'อนุมัติ';
-            element.admin_approve = '' + datamenager[0].userid;
-            element.save();
-            mail.mailApproved(rowDatas[0], u, m);
-            holiday.decreaseAmountDay(rowDatas[0]);
-            res.render('approve')
-            }catch {
-            res.send(false);
-            } 
-        }else{
-            res.render('cannotapprove')
-        }
-    });*/
 }
 
 //API ค้นหาตามเดือนของทั้งหมด

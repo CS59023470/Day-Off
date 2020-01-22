@@ -727,8 +727,8 @@ async function queryForCalendar(req, res) {
                 type: re.type,
                 detail: re.detailleave,
                 email: re.user.email,
+                statusWorking: re.user.statusWorking,
                 admin_approve: { name: admin ? admin.name : '', }
-
             }
         }
         if (re.type === 'ลากิจ') {

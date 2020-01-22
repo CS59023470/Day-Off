@@ -402,24 +402,46 @@ async function updateStatusLeaveRequestFromEmail(req, res) {
         query: 'rowid = ' + req.params.id
     });
 
-    const manager = await promisify(sheetUsers.getRows)({
-        query: 'email = "' + req.params.emailManager + '"'
-    });
+    if(rowDatas.length === 0){
+        res.render('cannotapprovewhenreject')
 
-    datamenager = manager.map((mng) => {
-        return {
-            userid: mng.userid
-        }
-    })
+    } else {
+        const manager = await promisify(sheetUsers.getRows)({
+            query: 'email = "' + req.params.emailManager + '"'
+        });
+    
+        datamenager = manager.map((mng) => {
+            return {
+                userid: mng.userid
+            }
+        })
+    
+        const user = await promisify(sheetUsers.getRows)({
+            query: 'userid = ' + rowDatas[0].idemployee
+        });
 
-    const user = await promisify(sheetUsers.getRows)({
-        query: 'userid = ' + rowDatas[0].idemployee
-    });
+        let u = user[0]
+        let m = manager[0]
 
-    let u = user[0]
-    let m = manager[0]
+        rowDatas.forEach(element => {
+            if(element.status === "") {
+                try {
+                element.status = 'อนุมัติ';
+                element.admin_approve = '' + datamenager[0].userid;
+                element.save();
+                mail.mailApproved(rowDatas[0], u, m);
+                holiday.decreaseAmountDay(rowDatas[0]);
+                res.render('approve')
+                }catch {
+                res.send(false);
+                } 
+            }else{
+                res.render('cannotapprove')
+            }
+        });
+    }
 
-    rowDatas.forEach(element => {
+    /*rowDatas.forEach(element => {
         if(element.status === "") {
             try {
             element.status = 'อนุมัติ';
@@ -434,7 +456,7 @@ async function updateStatusLeaveRequestFromEmail(req, res) {
         }else{
             res.render('cannotapprove')
         }
-    });
+    });*/
 }
 
 //API ค้นหาตามเดือนของทั้งหมด

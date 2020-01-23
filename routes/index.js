@@ -21,6 +21,7 @@ router.get('/userLogin/:email',sheet_login.checkUserLogin)
 router.get('/queryAllUser',sheet_user.queryAllUser)
 router.get('/queryDayLeft/:id',sheet_user.queryDayLeft)
 router.get('/queryAllUserforSearch/',sheet_user.queryAllUserforSearch)
+router.get('/queryUsers',sheet_user.queryAllUsers)
 
 //-- Day Off Controller
 router.get('/queryAllDayOff',sheet_day_off.quryAllDayOff)

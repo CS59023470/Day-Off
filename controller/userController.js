@@ -5,51 +5,82 @@ const sheet_api = require('../config/googlesheet_api');
 const custom = require('./customDataController');
 
 //API ค้นหาข้อมูลผู้ใช้ทั้งหมด
-async function queryAllUser(req, res){
+async function queryAllUser(req, res) {
     const doc = new GoogleSpreadsheet(sheet_api.sheetId);
     await promisify(doc.useServiceAccountAuth)(creds);
     const info = await promisify(doc.getInfo)();
     const sheet = info.worksheets[sheet_api.indexSheetUser];
 
     const rowUsers = await promisify(sheet.getRows)({
-        offset : 1
+        offset: 1
     });
 
     let listUser = rowUsers.map((res) => {
         return {
-            userId : res.userid,
-            email : res.email,
-            name : res.name,
-            position : res.position,
-            statusUser : custom.createStatusUserToString(res.statususer),
-            statusWorking : custom.createStatusWorkingToString(res.statusworking),
-            statusActive : custom.createStatusActiveToString(res.statusactive),
-            manager : res.manager,
-            sickday : res.sickdayleft,
-            personalday : res.personaldayleft,
-            vacationday : res.vacationdayleft,
-            specialday : res.specialholiday
+            userId: res.userid,
+            email: res.email,
+            name: res.name,
+            position: res.position,
+            statusUser: custom.createStatusUserToString(res.statususer),
+            statusWorking: custom.createStatusWorkingToString(res.statusworking),
+            statusActive: custom.createStatusActiveToString(res.statusactive),
+            manager: res.manager,
+            sickday: res.sickdayleft,
+            personalday: res.personaldayleft,
+            vacationday: res.vacationdayleft,
+            specialday: res.specialholiday
         }
     });
 
     return await listUser
 }
 
+// GET all user
+async function queryAllUsers(req, res) {
+    const doc = new GoogleSpreadsheet(sheet_api.sheetId);
+    await promisify(doc.useServiceAccountAuth)(creds);
+    const info = await promisify(doc.getInfo)();
+    const sheet = info.worksheets[sheet_api.indexSheetUser];
+
+    const rowUsers = await promisify(sheet.getRows)({
+        offset: 1
+    });
+
+    let listUser = rowUsers.map((res) => {
+        return {
+            userId: res.userid,
+            email: res.email,
+            name: res.name,
+            position: res.position,
+            statusUser: custom.createStatusUserToString(res.statususer),
+            statusWorking: custom.createStatusWorkingToString(res.statusworking),
+            statusActive: custom.createStatusActiveToString(res.statusactive),
+            manager: res.manager,
+            sickday: res.sickdayleft,
+            personalday: res.personaldayleft,
+            vacationday: res.vacationdayleft,
+            specialday: res.specialholiday
+        }
+    });
+
+    res.send(JSON.stringify(listUser));
+}
+
 //API ค้นหาผู้ใช้ ด้วย รหัสผู้ใช้ (userid)
-async function queryUserById(userId){
+async function queryUserById(userId) {
     const doc = new GoogleSpreadsheet(sheet_api.sheetId);
     await promisify(doc.useServiceAccountAuth)(creds);
     const info = await promisify(doc.getInfo)();
     const sheet = info.worksheets[sheet_api.indexSheetUser];
 
     const data_manager = await promisify(sheet.getRows)({
-        query : 'userid = '+userId
+        query: 'userid = ' + userId
     });
 
     let data = data_manager.map((res) => {
         return {
-            email : res.email,
-            name : res.name
+            email: res.email,
+            name: res.name
         }
     });
 
@@ -57,24 +88,24 @@ async function queryUserById(userId){
 }
 
 //API ค้นหาจำนวนการลาคงเหลือของผู้ใช้ ด้วย userid
-async function queryDayLeft(req, res){
+async function queryDayLeft(req, res) {
     const doc = new GoogleSpreadsheet(sheet_api.sheetId);
     await promisify(doc.useServiceAccountAuth)(creds);
     const info = await promisify(doc.getInfo)();
     const sheet = info.worksheets[sheet_api.indexSheetUser];
 
     const data_user = await promisify(sheet.getRows)({
-        query : 'userid = '+req.params.id
+        query: 'userid = ' + req.params.id
     });
 
     let data = data_user.map((res) => {
         let data_day_off = {
             sickdayleft: Number(res.sickdayleft),
-            personaldayleft:  Number(res.personaldayleft),
-            vacationdayleft:  Number(res.vacationdayleft),
-            specialholiday:  0,
+            personaldayleft: Number(res.personaldayleft),
+            vacationdayleft: Number(res.vacationdayleft),
+            specialholiday: 0,
         }
-        if(res.specialholiday !== '' && res.specialholiday !== '0'){
+        if (res.specialholiday !== '' && res.specialholiday !== '0') {
             data_day_off.specialholiday = Number(res.specialholiday)
         }
         return data_day_off
@@ -84,20 +115,20 @@ async function queryDayLeft(req, res){
 }
 
 //API ค้นหา super admin ทั้งหมด
-async function queryAllSuperAdmin(){
+async function queryAllSuperAdmin() {
     const doc = new GoogleSpreadsheet(sheet_api.sheetId);
     await promisify(doc.useServiceAccountAuth)(creds);
     const info = await promisify(doc.getInfo)();
     const sheet = info.worksheets[sheet_api.indexSheetUser];
 
     const data = await promisify(sheet.getRows)({
-        query : 'statususer = 0 & statusactive = 1'
+        query: 'statususer = 0 & statusactive = 1'
     });
 
     let data_superadmin = data.map((res) => {
         return {
-            email : res.email,
-            name : res.name
+            email: res.email,
+            name: res.name
         }
     });
 
@@ -105,28 +136,28 @@ async function queryAllSuperAdmin(){
 }
 
 //API ค้นหาข้อมูลผู้ใช้ทั้งหมด(สำหรับค้นหาข้อมูลประวัติ)
-async function queryAllUserforSearch(req, res){
+async function queryAllUserforSearch(req, res) {
     const doc = new GoogleSpreadsheet(sheet_api.sheetId);
     await promisify(doc.useServiceAccountAuth)(creds);
     const info = await promisify(doc.getInfo)();
     const sheet = info.worksheets[sheet_api.indexSheetUser];
 
     const rowUsers = await promisify(sheet.getRows)({
-        offset : 1
+        offset: 1
     });
 
     let listUser = rowUsers.map((res) => {
         return {
-            userId : res.userid,
-            name : res.name,
+            userId: res.userid,
+            name: res.name,
         }
     });
 
-    res.send(JSON.stringify(listUser))   
+    res.send(JSON.stringify(listUser))
 }
 
 //API แก้ไขจำนวนวันลางาน หลังจากขอลางานสำเร็จ
-async function updateHolidayUserById(userid,holiday_remove){
+async function updateHolidayUserById(userid, holiday_remove) {
     const doc = new GoogleSpreadsheet(sheet_api.sheetId);
     await promisify(doc.useServiceAccountAuth)(creds);
     const info = await promisify(doc.getInfo)();
@@ -141,7 +172,7 @@ async function updateHolidayUserById(userid,holiday_remove){
         user.save()
     });
 
-    return true  
+    return true
 }
 
 // API update the amount of day left by userid
@@ -156,7 +187,7 @@ async function updateDayLeftByUserId(modelData) {
         query: 'userid = ' + modelData.userid
     });
 
-    if(modelData.useSpecialHoliday > 0){
+    if (modelData.useSpecialHoliday > 0) {
         //Use Special Holiday
         rowUsers[0].specialholiday = Number(rowUsers[0].specialholiday) - modelData.useSpecialHoliday
     }
@@ -173,18 +204,18 @@ async function updateDayLeftByUserId(modelData) {
         default: break;
     }
 
-    try{
+    try {
         rowUsers.forEach(user => {
             user.save()
         });
         return true
-    }catch(err){
+    } catch (err) {
         return false
     }
 }
 
 //API เพิ่มจำนวนวันลางานของผู้ใช้ หลังจากการถูก Reject
-async function updateDayleaveWhenReject(dataDayleave){
+async function updateDayleaveWhenReject(dataDayleave) {
     const doc = new GoogleSpreadsheet(sheet_api.sheetId);
     await promisify(doc.useServiceAccountAuth)(creds);
     const info = await promisify(doc.getInfo)();
@@ -192,26 +223,26 @@ async function updateDayleaveWhenReject(dataDayleave){
     const rowUsers = await promisify(sheet.getRows)({
         query: 'userid = ' + dataDayleave.userid
     });
-    try{
+    try {
         rowUsers.forEach(data => {
-            switch(dataDayleave.type) {
-                case'ลากิจ' : 
-                    data.personaldayleft = Number(data.personaldayleft) + dataDayleave.usedayoff 
+            switch (dataDayleave.type) {
+                case 'ลากิจ':
+                    data.personaldayleft = Number(data.personaldayleft) + dataDayleave.usedayoff
                     break;
-                case'ลาป่วย' : 
-                    data.sickdayleft =  Number(data.sickdayleft) + dataDayleave.usedayoff
+                case 'ลาป่วย':
+                    data.sickdayleft = Number(data.sickdayleft) + dataDayleave.usedayoff
                     break;
-                case'ลาพักร้อน' : 
-                    data.vacationdayleft =  Number(data.vacationdayleft) + dataDayleave.usedayoff
+                case 'ลาพักร้อน':
+                    data.vacationdayleft = Number(data.vacationdayleft) + dataDayleave.usedayoff
                     break;
             }
-            if(dataDayleave.usespecialholiday !== 0){
+            if (dataDayleave.usespecialholiday !== 0) {
                 data.specialholiday = Number(data.specialholiday) + dataDayleave.usespecialholiday
             }
             data.save()
         })
         return true
-    }catch(err){
+    } catch (err) {
         return false
     }
 }
@@ -224,5 +255,6 @@ module.exports = {
     queryAllUserforSearch,
     updateHolidayUserById,
     updateDayleaveWhenReject,
-    updateDayLeftByUserId
+    updateDayLeftByUserId,
+    queryAllUsers
 };

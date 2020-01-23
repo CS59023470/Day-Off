@@ -104,7 +104,7 @@ async function queryAllLeaveRequestNotApprove(req, res) {
     const sheet = info.worksheets[sheet_api.indexSheetLeave];
     const listUser = await user_api.queryAllUser();
     const rowDatas = await promisify(sheet.getRows)({
-        query: 'status = "" & idemployee != '+ req.body.data.userid
+        query: 'status = "" & idemployee != ' + req.body.data.userid
     });
 
     let setUser = rowDatas.map((res) => {
@@ -126,9 +126,9 @@ async function queryAllLeaveRequestNotApprove(req, res) {
     let list_result = []
 
     setUser.forEach((leave, i) => {
-        if(leave.user.statusActive !== 'not_active'){
+        if (leave.user.statusActive !== 'not_active') {
             list_result.push(leave)
-        } 
+        }
     })
 
     res.send(JSON.stringify(list_result));
@@ -155,7 +155,7 @@ async function queryLeaveRequestNotApproveForAdmin(req, res) {
     })
 
     const rowDatas = await promisify(sheet.getRows)({
-        query: 'status = "" & idemployee != '+ req.body.data.userid
+        query: 'status = "" & idemployee != ' + req.body.data.userid
     });
 
     let list_result_return = []
@@ -615,22 +615,24 @@ async function queryLeaveHistory(req, res) {
                 list_result.push(row)
             }
         })
-       
-       list_result.forEach(re => {
-           list_user.add(re.idemployee);
-       })
-       list_user.forEach(data_user => {
-        let user = listUser.find((datauser) => { return datauser.userId === '' + `${data_user}`; })
-        let model = {
-            id: `${data_user}`,
-            name: user.name,
-            typeUser: user.statusWorking
-        }
-        list_send.push(model)
-     })
-     res.send(JSON.stringify(list_send))
-    
-    
+
+        list_result.forEach(re => {
+            list_user.add(re.idemployee);
+        })
+
+        list_user.forEach(data_user => {
+            let user = listUser.find((datauser) => { return datauser.userId === '' + `${data_user}`; })
+            let model = {
+                id: `${data_user}`,
+                name: user.name,
+                typeUser: user.statusWorking,
+                startdate: user.startDate
+            }
+            list_send.push(model)
+        })
+        res.send(JSON.stringify(list_send))
+
+
 
     } else {
         const rowDatas = await promisify(sheetLeave.getRows)({
@@ -672,9 +674,9 @@ async function queryLeaveHistory(req, res) {
                 typeUser: user.statusWorking
             }
             list_send.push(model)
-         })
+        })
         res.send(JSON.stringify(list_send))
-    }  
+    }
 
 }
 
@@ -701,7 +703,7 @@ async function queryForCalendar(req, res) {
             enddate: data.enddate,
             endtime: data.endtime,
             detailleave: data.detailleave,
-            admin_approve : data.admin_approve,
+            admin_approve: data.admin_approve,
             status: data.status,
             totalday: data.totalday,
             admin_approve: data.adminapprove,
@@ -900,7 +902,7 @@ function getMonthList(list) {
 
     let rs = []
     result.forEach(ele => {
-        if(ele.listLeave.length != 0){
+        if (ele.listLeave.length != 0) {
             rs.push(ele)
         }
     })

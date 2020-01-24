@@ -79,7 +79,6 @@ async function addLeaveRequest(req, res) {
         })
         res.send(true);
     } catch{
-        //console.log("----------> === ERROR")
         res.send(false);
     }
 }

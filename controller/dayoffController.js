@@ -20,8 +20,8 @@ async function quryAllDayOff(req, res){
     row.forEach(data => {
         if(data.enddate !== ""){
             //หยุดติดกันหลายวัน
-            let dataEnd = new Date(data.enddate);
-            if(nowDate <= dataEnd){
+            /*let dataEnd = new Date(data.enddate);
+            if(nowDate <= dataEnd){*/
                 let dataDayOff1 = {
                     status : 'Many days',
                     startdate : data.startdate,
@@ -29,11 +29,11 @@ async function quryAllDayOff(req, res){
                     description : data.description
                 }
                 listDate.push(dataDayOff1)
-            }
+            //}
         }else{
             //หยุดวันเดียว
-            let dateStart = new Date(data.startdate);
-            if(nowDate <= dateStart){
+            /*let dateStart = new Date(data.startdate);
+            if(nowDate <= dateStart){*/
                 let dataDayOff2 = {
                     status : 'One day',
                     startdate : data.startdate,
@@ -41,7 +41,7 @@ async function quryAllDayOff(req, res){
                     description : data.description
                 }
                 listDate.push(dataDayOff2)
-            }
+            //}
         }
     });
     res.send(JSON.stringify(listDate))

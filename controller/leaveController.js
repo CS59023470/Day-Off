@@ -578,10 +578,15 @@ async function queryLeaveHistory(req, res) {
     let userid = '' + req.body.data.userid
     let dateStart = new Date(req.body.data.startdate).getTime();
     let dateEnd = new Date(req.body.data.enddate).getTime();
+    let start_rqe = new Date(req.body.data.startdate);
+    let end_rqe = new Date(req.body.data.enddate);
 
     let list_result = []
-    let list_user = new Set();
+    let list_year = new Set();
     let list_send = []
+    let send = []
+    let name_month = [ 'January', 'February', 'March', 'April', 'May', 'June', 'July', 'Auguest', 'September', 'October', 'November', 'December',]
+
 
     if (userid === "") {
         const rowDatas = await promisify(sheetLeave.getRows)({
@@ -602,6 +607,8 @@ async function queryLeaveHistory(req, res) {
 
         result.forEach(row => {
 
+            let startTest = new Date(row.startdate);
+            let endTest = new Date(row.enddate);
             let std = new Date(row.startdate).getTime();
             let ed = new Date(row.enddate).getTime();
 
@@ -611,27 +618,95 @@ async function queryLeaveHistory(req, res) {
                 ((std <= dateStart && ed >= dateStart) && dateEnd >= ed) ||
                 (dateStart <= std && dateEnd >= ed)
             ) {
+                if(startTest.getFullYear() == endTest.getFullYear()){
+                    list_year.add(startTest.getFullYear())
+                }else{
+                    list_year.add(startTest.getFullYear())
+                    list_year.add(endTest.getFullYear())
+                }
                 list_result.push(row)
             }
         })
 
-        list_result.forEach(re => {
-            list_user.add(re.idemployee);
+        list_year.forEach(year => {
+            list_send.push(
+                {
+                    year: year,
+                    list_month : null
+                }
+            )
         })
 
-        list_user.forEach(data_user => {
-            let user = listUser.find((datauser) => { return datauser.userId === '' + `${data_user}`; })
-            let model = {
-                id: `${data_user}`,
-                name: user.name,
-                typeUser: user.statusWorking,
-                startdate: user.startDate
+        list_send.forEach((result,i) => {
+            list_send[i].list_month = [ [], [], [], [], [], [], [], [], [], [], [], [] ]
+            list_result.forEach((leave,j) => {
+                let start = new Date(leave.startdate);
+                let end = new Date(leave.enddate);
+                if(start.getFullYear() == result.year || end.getFullYear() == result.year){
+                    if(start.getFullYear() == end.getFullYear()){
+                        let between = end.getMonth() - start.getMonth()
+                        if(between == 0){
+                            let filter_user = list_send[i].list_month[start.getMonth()].filter(id_filter => {
+                                return id_filter.idemployee === leave.idemployee
+                            })
+                            if(filter_user.length === 0){
+                                list_send[i].list_month[start.getMonth()].push(leave)
+                            }
+                        }else{
+                            for(let t = start.getMonth() ; t <= end.getMonth() ; t++){
+                                let filter_user = list_send[i].list_month[t].filter(id_filter => {
+                                    return id_filter.idemployee === leave.idemployee
+                                })
+                                if(filter_user.length === 0){
+                                    list_send[i].list_month[t].push(leave)
+                                }
+                            }
+                        }
+                    }else{
+                        if(start.getFullYear() == result.year){
+                            for(let t = start.getMonth() ; t <= 11 ; t++){
+                                let filter_user = list_send[i].list_month[t].filter(id_filter => {
+                                    return id_filter.idemployee === leave.idemployee
+                                })
+                                if(filter_user.length === 0){
+                                    list_send[i].list_month[t].push(leave)
+                                }
+                            }
+                        }else{
+                            for(let t = 0 ; t <= end.getMonth() ; t++){
+                                let filter_user = list_send[i].list_month[t].filter(id_filter => {
+                                    return id_filter.idemployee === leave.idemployee
+                                })
+                                if(filter_user.length === 0){
+                                    list_send[i].list_month[t].push(leave)
+                                }
+                            }
+                        }
+                    }
+                }
+            })
+        })
+
+        list_send.forEach(result => {
+            if(result.year >= start_rqe.getFullYear() && result.year <= end_rqe.getFullYear()){
+                let model = {
+                    year: result.year,
+                    list_month: []
+                }
+                result.list_month.forEach((month,i) => {
+                    if(month.length !== 0 && i >= start_rqe.getMonth() && i <= end_rqe.getMonth()){
+                        model.list_month.push({
+                            name: name_month[i],
+                            data: month
+                        })
+                    }
+                })
+                send.push(model)
             }
-            list_send.push(model)
         })
-        res.send(JSON.stringify(list_send))
 
 
+        res.send(JSON.stringify(send))
 
     } else {
         const rowDatas = await promisify(sheetLeave.getRows)({
@@ -650,6 +725,9 @@ async function queryLeaveHistory(req, res) {
         })
 
         result.forEach(row => {
+
+            let startTest = new Date(row.startdate);
+            let endTest = new Date(row.enddate);
             let std = new Date(row.startdate).getTime();
             let ed = new Date(row.enddate).getTime();
 
@@ -659,24 +737,76 @@ async function queryLeaveHistory(req, res) {
                 ((std <= dateStart && ed >= dateStart) && dateEnd >= ed) ||
                 (dateStart <= std && dateEnd >= ed)
             ) {
+                if(startTest.getFullYear() == endTest.getFullYear()){
+                    list_year.add(startTest.getFullYear())
+                }else{
+                    list_year.add(startTest.getFullYear())
+                    list_year.add(endTest.getFullYear())
+                }
                 list_result.push(row)
             }
         })
-        list_result.forEach(re => {
-            list_user.add(re.idemployee);
-        })
-        list_user.forEach(data_user => {
-            let user = listUser.find((datauser) => { return datauser.userId === '' + `${data_user}`; })
-            let model = {
-                id: `${data_user}`,
-                name: user.name,
-                typeUser: user.statusWorking
-            }
-            list_send.push(model)
-        })
-        res.send(JSON.stringify(list_send))
-    }
 
+        list_year.forEach(year => {
+            list_send.push(
+                {
+                    year: year,
+                    list_month : null
+                }
+            )
+        })
+
+        list_send.forEach((result,i) => {
+            list_send[i].list_month = [ [], [], [], [], [], [], [], [], [], [], [], [] ]
+            list_result.forEach((leave,j) => {
+                let start = new Date(leave.startdate);
+                let end = new Date(leave.enddate);
+                if(start.getFullYear() == result.year || end.getFullYear() == result.year){
+                    if(start.getFullYear() == end.getFullYear()){
+                        let between = end.getMonth() - start.getMonth()
+                        if(between == 0){
+                            list_send[i].list_month[start.getMonth()].push(leave)
+                        }else{
+                            for(let t = start.getMonth() ; t <= end.getMonth() ; t++){
+                                list_send[i].list_month[t].push(leave)
+                            }
+                        }
+                    }else{
+                        if(start.getFullYear() == result.year){
+                            for(let t = start.getMonth() ; t <= 11 ; t++){
+                                list_send[i].list_month[t].push(leave)
+                            }
+                        }else{
+                            for(let t = 0 ; t <= end.getMonth() ; t++){
+                                list_send[i].list_month[t].push(leave)
+                            }
+                        }
+                    }
+                }
+            })
+        })
+
+        list_send.forEach(result => {
+            if(result.year >= start_rqe.getFullYear() && result.year <= end_rqe.getFullYear()){
+                let model = {
+                    year: result.year,
+                    list_month: []
+                }
+                result.list_month.forEach((month,i) => {
+                    if(month.length !== 0 && i >= start_rqe.getMonth() && i <= end_rqe.getMonth()){
+                        model.list_month.push({
+                            name: name_month[i],
+                            data: month
+                        })
+                    }
+                })
+                send.push(model)
+            }
+        })
+
+
+        res.send(JSON.stringify(send))
+    }
 }
 
 // Query Data For Calendar

@@ -33,7 +33,7 @@ function mailApproved(rowDatas,user,manager){
               'This is an automatically generated email. Do not reply. If you have any problems<br>'+
               'with the service please contact your company Artisan Digital Administrator.<br>'+
               'Approved by K. '+manager.name+'<br><br>'+
-              '<a href="www.youtube.com">Go to Website</a>'
+              '<a href="https://day-off-frontend.herokuapp.com">Go to Website</a>'
       };
       // send >>
       transporter.sendMail(mailOptions, function (err, info) {

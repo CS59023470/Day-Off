@@ -4,7 +4,7 @@
     <title></title>
     <link rel='stylesheet' href='/stylesheets/style.css' />
     <style>
-        .test{
+        .layout_approve{
             width: 100vw;
             height: 100vh;
             position: fixed;
@@ -16,20 +16,23 @@
             background-color: #5CB85C;
             flex-direction: column;
         }
-        h1{
+        .text{
             color: #fff;
             font-size: 10vw;
         }
         #countdown {
-          font-size: 5vw;
+          font-size: 6vw;
           color: #fff;
         }
     </style>
   </head>
   <body>
-      <div class="test">
-        <h1>Approved!</h1>
-        <h2 id="countdown">5</h2>
+      <div class="layout_approve">
+        <div class="icon">
+          <img src="/images/approve.png" alt="images approve">
+        </div>
+        <div class="text">APPROVED!</div>
+        <div id="countdown">5</div>
       </div>
   </body>
     <script 

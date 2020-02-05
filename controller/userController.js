@@ -192,13 +192,13 @@ async function updateDayLeftByUserId(modelData) {
         rowUsers[0].specialholiday = Number(rowUsers[0].specialholiday) - modelData.useSpecialHoliday
     }
     switch (modelData.type) {
-        case 'ลากิจ'://personal leave
+        case 'Personal Leave'://personal leave
             rowUsers[0].personaldayleft = Number(rowUsers[0].personaldayleft) - modelData.useDayOff
             break;
-        case 'ลาพักร้อน'://vacation leave
+        case 'Vacation Leave'://vacation leave
             rowUsers[0].vacationdayleft = Number(rowUsers[0].vacationdayleft) - modelData.useDayOff
             break;
-        case 'ลาป่วย'://sick leave
+        case 'Sick Leave'://sick leave
             rowUsers[0].sickdayleft = Number(rowUsers[0].sickdayleft) - modelData.useDayOff
             break;
         default: break;
@@ -226,13 +226,13 @@ async function updateDayleaveWhenReject(dataDayleave) {
     try {
         rowUsers.forEach(data => {
             switch (dataDayleave.type) {
-                case 'ลากิจ':
+                case 'Personal Leave':
                     data.personaldayleft = Number(data.personaldayleft) + dataDayleave.usedayoff
                     break;
-                case 'ลาป่วย':
+                case 'Sick Leave':
                     data.sickdayleft = Number(data.sickdayleft) + dataDayleave.usedayoff
                     break;
-                case 'ลาพักร้อน':
+                case 'Vacation Leave':
                     data.vacationdayleft = Number(data.vacationdayleft) + dataDayleave.usedayoff
                     break;
             }

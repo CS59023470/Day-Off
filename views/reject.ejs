@@ -4,7 +4,7 @@
     <title></title>
     <link rel='stylesheet' href='/stylesheets/style.css' />
     <style>
-        .test{
+        .layout_reject{
             width: 100vw;
             height: 100vh;
             position: fixed;
@@ -13,24 +13,28 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            background-color: #5CB85C;
+            background-color: red;
             flex-direction: column;
         }
-        h1{
+        .text{
             color: #fff;
             font-size: 10vw;
         }
         #countdown {
-          font-size: 5vw;
+          font-size: 6vw;
           color: #fff;
         }
     </style>
   </head>
   <body>
-      <div class="test">
-        <h1>Rejected!</h1>
-        <h2 id="countdown">5</h2>
-      </div>
+      <div class="layout_reject">
+        <div class="icon">
+          <img src="/images/cancel.png" alt="images cancel">
+        </div>
+        <div class="text">REJECTED!</div>
+        <div id="countdown">5</div>
+      </div
+      >
   </body>
     <script 
         type='text/javascript'> 

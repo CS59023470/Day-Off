@@ -29,7 +29,7 @@ function createStatusActiveToString(status){
 //function คำนวณผลรวมวันลางาน
 function calculatedTotalDay(data){
 
-    let string_check_full_day = 'เต็มวัน';
+    let string_check_full_day = 'All-Day';
     let typeDay = data.typeday;  // 0 คือ <= ลา 1 วัน , 1 คือ > ลาหลายวัน
 
     let startDate = new Date(""+data.startdate); 
@@ -83,11 +83,20 @@ function createDateToString(data){
     return `${date.getDate()}/${date.getMonth()+1}/${date.getFullYear()}`;
 }
 
+//Format Date To String And Name Month
+function createDateToStringforEmail(data){
+    let month = ['January','February','March','April','May','June','July','August','September','October','November','December',]
+    let date = new Date(data);
+
+    return `${date.getDate()} ${month[date.getMonth()]} ${date.getFullYear()}`;
+}
+
 module.exports = {
     createStatusUserToString,
     createStatusWorkingToString,
     createStatusActiveToString,
     calculatedTotalDay,
     createRowId,
-    createDateToString
+    createDateToString,
+    createDateToStringforEmail
 };

@@ -4,7 +4,7 @@
     <title></title>
     <link rel='stylesheet' href='/stylesheets/style.css' />
     <style>
-        .test{
+        .layout_cannot_approve{
             width: 90vw;
             height: 100vh;
             padding: 0px 5vw;
@@ -14,24 +14,38 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            background-color: #C9302C;
+            background-color: #0F4C81;
             flex-direction: column;
         }
-        h1{
-            text-align: center;
-            color: #fff;
-            font-size: 6vw;
+        .normalText {
+          font-size: 5vw;
+          padding: 0px 10px;
+          color: white;
+        }
+        .redText {
+          font-size: 5vw;
+          padding: 0px 10px;
+          color: red;
+        }
+        .orangeText {
+          font-size: 5vw;
+          padding: 0px 10px;
+          color: #F97111;
         }
         #countdown {
-          font-size: 5vw;
+          font-size: 6vw;
           color: #fff;
         }
     </style>
   </head>
   <body>
-      <div class="test">
-        <h1>Other admin or super admin has been rejected!</h1>
-        <h2 id="countdown">7</h2>
+      <div class="layout_cannot_approve">
+        <div class="icon">
+          <img src="/images/alert.png" alt="image alert">
+        </div>
+        <div><label class="normalText">This request has been</label><label class="redText">REJECTED</label>  </div>
+        <div><label class="normalText">by</label> <label class="orangeText">another Manager</label></div>
+        <div id="countdown">7</div>
       </div>
   </body>
     <script 

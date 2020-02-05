@@ -42,23 +42,23 @@ async function addLeaveRequest(req, res) {
     }
 
     switch (req.body.data.type) {
-        case 'PL': row.type = 'ลากิจ'; break;
-        case 'SL': row.type = 'ลาป่วย'; row.status = 'อนุมัติ'; holiday.decreaseAmountDay(row); break;
-        case 'VL': row.type = 'ลาพักร้อน'; break;
+        case 'PL': row.type = 'Personal Leave'; break;
+        case 'SL': row.type = 'Sick Leave'; row.status = 'Approved'; holiday.decreaseAmountDay(row); break;
+        case 'VL': row.type = 'Vacation Leave'; break;
         default: break;
     }
 
     switch (req.body.data.starttime) {
-        case 'allday': row.starttime = 'เต็มวัน'; break;
-        case 'morning': row.starttime = 'ช่วงเช้า'; break;
-        case 'afternoon': row.starttime = 'ช่วงบ่าย'; break;
+        case 'allday': row.starttime = 'All-Day'; break;
+        case 'morning': row.starttime = 'Morning'; break;
+        case 'afternoon': row.starttime = 'Afternoon'; break;
         default: break;
     }
 
     switch (req.body.data.endtime) {
-        case 'allday': row.endtime = 'เต็มวัน'; break;
-        case 'morning': row.endtime = 'ช่วงเช้า'; break;
-        case 'afternoon': row.endtime = 'ช่วงบ่าย'; break;
+        case 'allday': row.endtime = 'All-Day'; break;
+        case 'morning': row.endtime = 'Morning'; break;
+        case 'afternoon': row.endtime = 'Afternoon'; break;
         default: break;
     }
 
@@ -223,15 +223,15 @@ async function queryAllLeaveRequestApprove(req, res) {
     })
 
     let personal_leave = checkActive.filter((list, i) => {
-        return list.type === 'ลากิจ'
+        return list.type === 'Personal Leave'
     })
 
     let sick_leave = checkActive.filter((list, i) => {
-        return list.type === 'ลาป่วย'
+        return list.type === 'Sick Leave'
     })
 
     let vacation_leave = checkActive.filter((list, i) => {
-        return list.type === 'ลาพักร้อน'
+        return list.type === 'Vacation Leave'
     })
 
     let resultData = {
@@ -333,7 +333,7 @@ async function updateStatusLeaveRequest(req, res) {
             let m = manager[0]
             rowDatas.forEach(element => {
                 try {
-                    element.status = 'อนุมัติ';
+                    element.status = 'Approved';
                     element.admin_approve = '' + manager[0].userid;
                     element.save();
                     mail.mailApproved(rowDatas[0], u, m);
@@ -456,7 +456,7 @@ async function updateStatusLeaveRequestFromEmail(req, res) {
         rowDatas.forEach(element => {
             if(element.status === "") {
                 try {
-                element.status = 'อนุมัติ';
+                element.status = 'Approved';
                 element.admin_approve = '' + datamenager[0].userid;
                 element.save();
                 mail.mailApproved(rowDatas[0], u, m);
@@ -862,9 +862,9 @@ async function queryForCalendar(req, res) {
                 admin_approve: { name: admin ? admin.name : '', }
             }
         }
-        if (re.type === 'ลากิจ') {
+        if (re.type === 'Personal Leave') {
             model.id = 'PL'
-        } else if (re.type === 'ลาป่วย') {
+        } else if (re.type === 'Sick Leave') {
             model.id = 'SL'
         } else {
             model.id = 'VL'
@@ -909,13 +909,13 @@ async function queryHistoryLeaveByID(req, res) {
         }
         all.push(model)
 
-        if (data.type === 'ลาป่วย') {//sick leave
+        if (data.type === 'Sick Leave') {//sick leave
             sick.push(model)
         }
-        if (data.type === 'ลากิจ') {//personal leave
+        if (data.type === 'Personal Leave') {//personal leave
             personal.push(model)
         }
-        if (data.type === 'ลาพักร้อน') {//vacation leave
+        if (data.type === 'Vacation Leave') {//vacation leave
             vacation.push(model)
         }
     })

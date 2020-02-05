@@ -1,4 +1,5 @@
 const nodemailer = require('nodemailer')
+const custom = require('../controller/customDataController');
 // config mail >>
 const sender = 'pongnarit.fk@gmail.com'
 const password = 'Pongnarit30666'
@@ -12,6 +13,10 @@ const transporter = nodemailer.createTransport({
 });
 
 function mailApproved(rowDatas,user,manager){
+
+  let startDate = custom.createDateToStringforEmail(rowDatas.startdate)
+  let endDate = custom.createDateToStringforEmail(rowDatas.enddate)
+
     // set text >>
     let mailOptions = {
         from: sender ,// sender
@@ -19,7 +24,7 @@ function mailApproved(rowDatas,user,manager){
         subject: 'Leave Request Response',// Mail subject
         html: 'Dear K. '+user.name+'<br>'+
               'Subject Leave Request Response.<br><br>'+
-              'Your request for '+rowDatas.detailleave+' '+rowDatas.startdate+' - '+rowDatas.enddate+'<br>'+
+              'Your request for '+rowDatas.detailleave+' on '+startDate+' - '+endDate+'<br>'+
               '<h1 style="color: #5CB85C">Has been approved.</h1><br><br>'+
               
               'Please go back to work, When the time limit is reached.<br><br>'+
@@ -42,6 +47,10 @@ function mailApproved(rowDatas,user,manager){
      });
 };
 function mailRejected(rowDatas,user,manager){
+
+  let startDate = custom.createDateToStringforEmail(rowDatas.startdate)
+  let endDate = custom.createDateToStringforEmail(rowDatas.enddate)
+
   // set text >>
   let mailOptions = {
       from: sender,// sender
@@ -49,7 +58,7 @@ function mailRejected(rowDatas,user,manager){
       subject: 'Leave Request Response',// Mail subject
       html: 'Dear K. '+user.name+'<br>'+
       'Subject Leave Request Response.<br><br>'+
-      'Your request for '+rowDatas.detailleave+' '+rowDatas.startdate+' - '+rowDatas.enddate+'<br>'+
+      'Your request for '+rowDatas.detailleave+' on '+startDate+' - '+endDate+'<br>'+
       '<h1 style="color: #C9302C">Has been rejected.</h1><br><br>'+
       
       'Please go back to work, When the time limit is reached.<br><br>'+
@@ -58,7 +67,7 @@ function mailRejected(rowDatas,user,manager){
       'This is an automatically generated email. Do not reply. If you have any problems<br>'+
       'with the service please contact your company Artisan Digital Administrator.<br>'+
       'Reject by K. '+manager.name+'<br><br>'+
-      '<a href="www.youtube.com">Go to Website</a>'
+      '<a href="https://day-off-frontend.herokuapp.com">Go to Website</a>'
     };
     // send >>
     transporter.sendMail(mailOptions, function (err, info) {
@@ -73,14 +82,18 @@ function mailRejected(rowDatas,user,manager){
 };
 
 function mailRequestManager(managerEmail,row){
-    let textbutton = '<a href="https://day-off-backend.herokuapp.com/updateLeaveRequestFromEmail/'+row.rowid+'/'+managerEmail.email+'"><button style="background-color: #5CB85C;border: none;border-radius: 5px;padding: 10px 30px;color: #fff;"">Approve</button></a>'+' '+
-                     '<a href="https://day-off-backend.herokuapp.com/removeLeaveRequestFromEmail/'+row.rowid+'/'+managerEmail.email+'"><button  style="background-color: #C9302C;border: none;border-radius: 5px;padding: 10px 30px;color: #fff;">Reject</button></a><br><br>'
+    let textbutton = '<a href="http://localhost:3500/updateLeaveRequestFromEmail/'+row.rowid+'/'+managerEmail.email+'"><button style="background-color: #5CB85C;border: none;border-radius: 5px;padding: 10px 30px;color: #fff;"">Approve</button></a>'+' '+
+                     '<a href="http://localhost:3500/removeLeaveRequestFromEmail/'+row.rowid+'/'+managerEmail.email+'"><button  style="background-color: #C9302C;border: none;border-radius: 5px;padding: 10px 30px;color: #fff;">Reject</button></a><br><br>'
     let textresponse = 'Please response leave request from K. '+row.user.name+'<br>'
     
-    if(row.type == "ลาป่วย"){
+    if(row.type == "Sick Leave"){
       textbutton = ''
       textresponse = ''
     }
+
+    let startDate = custom.createDateToStringforEmail(row.startdate)
+    let endDate = custom.createDateToStringforEmail(row.enddate)
+
     
     
     let mailOptions = {
@@ -91,7 +104,8 @@ function mailRequestManager(managerEmail,row){
         'Subject Request for Leave from K. '+row.user.name+'<br><br>'+
         textresponse+
         'Request as <br>'+
-        '&emsp;&emsp;&emsp;&emsp;&emsp; '+row.type+' ('+row.startdate+' '+row.starttime+' to '+row.enddate+' '+row.endtime+') '+row.detailleave+' <br><br>'+
+        '&emsp;&emsp;&emsp;&emsp;&emsp; '+row.type+' ('+startDate+', '+row.starttime+' to '+endDate+', '+row.endtime+') <br><br>'+
+        '&emsp;&emsp;&emsp;&emsp;&emsp; Description : '+row.detailleave+' <br><br>'+
                 
         'Best regards,<br>'+
         'Artisan Digital Asia Co .,Ltd.<br><br>'+
@@ -100,7 +114,7 @@ function mailRequestManager(managerEmail,row){
         
         textbutton+
 
-        '<a href="www.youtube.com">Go to Website</a>',
+        '<a href="https://day-off-frontend.herokuapp.com">Go to Website</a>',
 
       }
       // send >>

@@ -49,8 +49,8 @@ async function queryAllUsers(req, res) {
     let listUser = rowUsers.map((res) => {
         return {
             userId: res.userid,
-            email: res.email,
             name: res.name,
+            email: res.email,
             position: res.position,
             statusUser: custom.createStatusUserToString(res.statususer),
             statusWorking: custom.createStatusWorkingToString(res.statusworking),

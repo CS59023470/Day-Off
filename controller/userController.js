@@ -28,7 +28,8 @@ async function queryAllUser(req, res) {
             sickday: res.sickdayleft,
             personalday: res.personaldayleft,
             vacationday: res.vacationdayleft,
-            specialday: res.specialholiday
+            specialday: res.specialholiday,
+            image: res.image
         }
     });
 
@@ -59,7 +60,8 @@ async function queryAllUsers(req, res) {
             sickday: res.sickdayleft,
             personalday: res.personaldayleft,
             vacationday: res.vacationdayleft,
-            specialday: res.specialholiday
+            specialday: res.specialholiday,
+            image:  res.image
         }
     });
 

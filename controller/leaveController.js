@@ -1039,6 +1039,63 @@ function getMonthList(list) {
     return rs;
 }
 
+async function querydayByidforCarlendar(req, res) {
+    const doc = new GoogleSpreadsheet(sheet_api.sheetId);
+    await promisify(doc.useServiceAccountAuth)(creds);
+    const info = await promisify(doc.getInfo)();
+    const sheetLeave = info.worksheets[sheet_api.indexSheetLeave];
+
+    const rowDatas = await promisify(sheetLeave.getRows)({
+        query: 'idemployee = ' + req.body.data.userid
+    });
+    
+    let list_one_day = []
+    let list_group_manyday = []
+    rowDatas.forEach(data => {
+        if(data.startdate === data.enddate){
+            let oneday = {
+                startdate : data.startdate,
+                enddate : data.enddate,
+                description: data.detailleave
+            }
+            list_one_day.push(oneday)
+        }else{
+            let manyday = {
+                startdate : data.startdate,
+                enddate : data.enddate,
+                description: data.detailleave
+            }
+            list_group_manyday.push(manyday)
+        }
+    });
+    let result_return = createDateForCalendarForm(list_one_day,list_group_manyday)
+
+    res.send(JSON.stringify(result_return))
+    
+}
+
+function createDateForCalendarForm(list_one_day,list_group_manyday) {
+    let result = list_one_day
+    list_group_manyday.forEach(group_day => {
+        
+        let between = custom.checkBetweenDate(group_day.startdate,group_day.enddate)+1
+        for(let i = 0 ; i < between ; i++){
+            let date = new Date(group_day.startdate)
+            date.setDate(date.getDate()+i)
+            let string_date = custom.createDateToStringFormatDefult(date)
+            let oneday = {
+                startdate : string_date,
+                enddate : string_date,
+                description: group_day.description
+            }
+            result.push(oneday)
+        }
+    })
+
+    return result
+
+}
+
 module.exports = {
     addLeaveRequest,
     removeLeaveRequest,
@@ -1051,6 +1108,7 @@ module.exports = {
     queryForCalendar,
     updateStatusLeaveRequestFromEmail,
     removeLeaveRequestFormEmail,
-    queryLeaveHistory
+    queryLeaveHistory,
+    querydayByidforCarlendar
 
 };

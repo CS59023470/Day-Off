@@ -37,6 +37,7 @@ router.post('/leaveRequestForAdmin',sheet_leave.queryLeaveRequestNotApproveForAd
 router.get('/historyallbyid/:id',sheet_leave.queryHistoryLeaveByID)
 router.get('/queryforcalendar',sheet_leave.queryForCalendar)
 router.post('/historyall',sheet_leave.queryLeaveHistory)
+router.post('/querydaybyid',sheet_leave.querydayByidforCarlendar)
 
 //-- Email Controller
 router.get('/updateLeaveRequestFromEmail/:id/:emailManager',sheet_leave.updateStatusLeaveRequestFromEmail)

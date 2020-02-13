@@ -83,6 +83,26 @@ function createDateToString(data){
     return `${date.getDate()}/${date.getMonth()+1}/${date.getFullYear()}`;
 }
 
+//Format defult Date To String
+function createDateToStringFormatDefult(data){
+    let date = new Date(data);
+    let stringYear = date.getFullYear()+''
+    let stringMonth = ''
+    let stringDay = ''
+    
+    if((date.getMonth()+1) < 10){
+        stringMonth = '0'+(date.getMonth()+1)
+    }else{
+        stringMonth = ''+(date.getMonth()+1)
+    }
+    if(date.getDate() < 10){
+        stringDay = '0'+date.getDate()
+    }else{
+        stringDay = ''+date.getDate()
+    }
+    return `${stringYear}-${stringMonth}-${stringDay}`
+}
+
 //Format Date To String And Name Month
 function createDateToStringforEmail(data){
     let month = ['January','February','March','April','May','June','July','August','September','October','November','December',]
@@ -98,5 +118,7 @@ module.exports = {
     calculatedTotalDay,
     createRowId,
     createDateToString,
-    createDateToStringforEmail
+    createDateToStringforEmail,
+    checkBetweenDate,
+    createDateToStringFormatDefult
 };

@@ -10,7 +10,6 @@ async function quryAllDayOff(req, res){
     const info = await promisify(doc.getInfo)();
     const sheet = info.worksheets[sheet_api.indexSheetCompanyDayoff];
 
-    let nowDate = new Date();
     let listDate = [];
 
     const row = await promisify(sheet.getRows)({
@@ -19,9 +18,6 @@ async function quryAllDayOff(req, res){
 
     row.forEach(data => {
         if(data.enddate !== ""){
-            //หยุดติดกันหลายวัน
-            /*let dataEnd = new Date(data.enddate);
-            if(nowDate <= dataEnd){*/
                 let dataDayOff1 = {
                     status : 'Many days',
                     startdate : data.startdate,
@@ -29,11 +25,7 @@ async function quryAllDayOff(req, res){
                     description : data.description
                 }
                 listDate.push(dataDayOff1)
-            //}
         }else{
-            //หยุดวันเดียว
-            /*let dateStart = new Date(data.startdate);
-            if(nowDate <= dateStart){*/
                 let dataDayOff2 = {
                     status : 'One day',
                     startdate : data.startdate,
@@ -41,7 +33,6 @@ async function quryAllDayOff(req, res){
                     description : data.description
                 }
                 listDate.push(dataDayOff2)
-            //}
         }
     });
     res.send(JSON.stringify(listDate))
@@ -54,7 +45,6 @@ async function quryAllDayOffForcalendar(req, res){
     const info = await promisify(doc.getInfo)();
     const sheet = info.worksheets[sheet_api.indexSheetCompanyDayoff];
 
-    let nowDate = new Date();
     let listDate = [];
 
     const row = await promisify(sheet.getRows)({

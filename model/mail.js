@@ -33,7 +33,7 @@ function mailApproved(rowDatas,user,manager){
               'This is an automatically generated email. Do not reply. If you have any problems<br>'+
               'with the service please contact your company Artisan Digital Administrator.<br>'+
               'Approved by K. '+manager.name+'<br><br>'+
-              '<a href="https://day-off-frontend.herokuapp.com">Go to Website</a>'
+              '<a href="www.youtube.com">Go to Website</a>'
       };
       // send >>
       transporter.sendMail(mailOptions, function (err, info) {
@@ -82,8 +82,8 @@ function mailRejected(rowDatas,user,manager){
 };
 
 function mailRequestManager(managerEmail,row){
-    let textbutton = '<a href="https://day-off-backend.herokuapp.com/updateLeaveRequestFromEmail/'+row.rowid+'/'+managerEmail.email+'"><button style="background-color: #5CB85C;border: none;border-radius: 5px;padding: 10px 30px;color: #fff;"">Approve</button></a>'+' '+
-                     '<a href="https://day-off-backend.herokuapp.com/removeLeaveRequestFromEmail/'+row.rowid+'/'+managerEmail.email+'"><button  style="background-color: #C9302C;border: none;border-radius: 5px;padding: 10px 30px;color: #fff;">Reject</button></a><br><br>'
+    let textbutton = '<a href="http://localhost:3500/updateLeaveRequestFromEmail/'+row.rowid+'/'+managerEmail.email+'"><button style="background-color: #5CB85C;border: none;border-radius: 5px;padding: 10px 30px;color: #fff;"">Approve</button></a>'+' '+
+                     '<a href="http://localhost:3500/removeLeaveRequestFromEmail/'+row.rowid+'/'+managerEmail.email+'"><button  style="background-color: #C9302C;border: none;border-radius: 5px;padding: 10px 30px;color: #fff;">Reject</button></a><br><br>'
     let textresponse = 'Please response leave request from K. '+row.user.name+'<br>'
     
     if(row.type == "Sick Leave"){

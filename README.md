@@ -1,7 +1,7 @@
 # Day-Off
 
 # install dependencies
-$ npm run install
+$ npm install
 
 # serve with hot reload at localhost:3500
 $ npx nodemon

@@ -213,8 +213,6 @@ async function queryAllLeaveRequestApprove(req, res) {
             usedayoff: res.usedayoff,
             usespecialholiday: res.usespecialholiday,
             user: listUser.find((datauser) => { return datauser.userId === '' + res.idemployee; }),
-
-
         }
     });
 
@@ -1039,6 +1037,183 @@ function getMonthList(list) {
     return rs;
 }
 
+//API ค้นหารายการ ขอลางาน ทั้งหมดที่ได้รับการอนุมัติ สำหรับ หน้า report
+async function queryAllLeaveForReport(req, res) {
+    const doc = new GoogleSpreadsheet(sheet_api.sheetId);
+    await promisify(doc.useServiceAccountAuth)(creds);
+    const info = await promisify(doc.getInfo)();
+    const sheet = info.worksheets[sheet_api.indexSheetLeave];
+
+    const listUser = await user_api.queryAllUser();
+
+    const rowDatas = await promisify(sheet.getRows)({
+        query: 'status != ""'
+    });
+
+    let setUser = rowDatas.map((res) => {
+        return {
+            rowId: res.rowid,
+            idUser: res.idemployee,
+            type: res.type,
+            startDate: res.startdate,
+            starttime: res.starttime,
+            endDate: res.enddate,
+            endtime: res.endtime,
+            detail: res.detailleave,
+            usedayoff: res.usedayoff,
+            usespecialholiday: res.usespecialholiday,
+            user: listUser.find((datauser) => { return datauser.userId === '' + res.idemployee; }),
+        }
+    });
+
+    let checkActive = setUser.filter((leave, i) => {
+        return leave.user.statusActive !== 'not_active'
+    })
+
+    let list_userId = new Set();
+    checkActive.forEach(list_leave => {
+        list_userId.add(list_leave.idUser)
+    })
+
+    let model_return = []
+
+    list_userId.forEach(userId => {
+        checkActive.forEach(leave => {
+            if(userId === leave.idUser){
+                let model = {
+                    userId: userId,
+                    name: '',
+                    date: '',
+                    type: '',
+                    department: '',
+                    statusMorning: false,
+                    statusAfternoon: false
+                }
+
+                model.name = leave.user.name
+                model.type = leave.type
+                model.department = leave.user.department
+
+                if(leave.startDate === leave.endDate){
+                    //ลาวันเดียว
+                    model.date = leave.startDate
+
+                    if(leave.starttime === 'All-Day'){
+                        model.statusMorning = true
+                        model.statusAfternoon = true
+                    }else if(leave.starttime === 'Afternoon'){
+                        model.statusAfternoon = true
+                    }else{
+                        model.statusMorning = true
+                    }
+
+                    model_return.push(model)
+                }else{
+                    //ลาหลายวัน
+                    let between = custom.checkBetweenDate(leave.startDate, leave.endDate)+1
+                    for(let i = 0 ; i < between ; i++){
+                        let model = {
+                            userId: userId,
+                            name: '',
+                            date: '',
+                            type: '',
+                            department: '',
+                            statusMorning: false,
+                            statusAfternoon: false
+                        }
+
+                        model.name = leave.user.name
+                        model.type = leave.type
+                        model.department = leave.user.department
+                        
+                        if(i === 0){
+                            //วันแรก 
+                            model.date = leave.startDate
+                            if(leave.starttime === 'All-Day'){
+                                model.statusMorning = true
+                                model.statusAfternoon = true
+                            }else if(leave.starttime === 'Afternoon'){
+                                model.statusAfternoon = true
+                            }else{
+                                model.statusMorning = true
+                            }
+                        }else if((i+1) === between){
+                            //วันสุดท้าย
+                            model.date = leave.endDate
+                            if(leave.endtime === 'All-Day'){
+                                model.statusMorning = true
+                                model.statusAfternoon = true
+                            }else if(leave.endtime === 'Afternoon'){
+                                model.statusAfternoon = true
+                            }else{
+                                model.statusMorning = true
+                            }
+                        }else{
+                            model.date = getAllDayForReport(leave.startDate, i)
+                            model.statusMorning = true
+                            model.statusAfternoon = true
+                        }
+
+                        model_return.push(model)
+                    }
+                }  
+            }
+        })
+    })
+
+    let list_return = []
+    list_userId.forEach(userId => {
+        let model = {
+            userId: userId,
+            nameUser: '',
+            department: '',
+            listLeave: []
+        }
+        list_return.push(model)
+    })
+    
+    list_return.forEach(user => {
+        model_return.forEach(model => {
+            if(user.userId === model.userId){
+                user.nameUser = model.name
+                user.department = model.department
+                let leave = {
+                    date: model.date,
+                    type: model.type,
+                    statusMorning: model.statusMorning,
+                    statusAfternoon: model.statusAfternoon
+                }
+                user.listLeave.push(leave)
+            }
+        })
+    })
+    
+    //res.send(JSON.stringify(checkActive));
+    res.send(JSON.stringify(list_return));
+}
+
+function getAllDayForReport(startDate, i) {
+    let date = new Date(startDate)
+    date.setDate(date.getDate()+i)
+
+    let stringYear = date.getFullYear()+''
+    let stringMonth = ''
+    let stringDay = ''
+
+    if((date.getMonth()+1) < 10){
+        stringMonth = '0'+(date.getMonth()+1)
+    }else{
+        stringMonth = ''+(date.getMonth()+1)
+    }
+
+    if(date.getDate() < 10){
+        stringDay = '0'+date.getDate()
+    }else{
+        stringDay = ''+date.getDate()
+    }
+    return `${stringYear}-${stringMonth}-${stringDay}`
+}
+
 async function querydayByidforCarlendar(req, res) {
     const doc = new GoogleSpreadsheet(sheet_api.sheetId);
     await promisify(doc.useServiceAccountAuth)(creds);
@@ -1093,7 +1268,6 @@ function createDateForCalendarForm(list_one_day,list_group_manyday) {
     })
 
     return result
-
 }
 
 module.exports = {
@@ -1109,6 +1283,6 @@ module.exports = {
     updateStatusLeaveRequestFromEmail,
     removeLeaveRequestFormEmail,
     queryLeaveHistory,
+    queryAllLeaveForReport,
     querydayByidforCarlendar
-
 };

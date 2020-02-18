@@ -54,6 +54,7 @@ async function queryAllUsers(req, res) {
             name: res.name,
             email: res.email,
             position: res.position,
+            department: res.department,
             statusUser: custom.createStatusUserToString(res.statususer),
             statusWorking: custom.createStatusWorkingToString(res.statusworking),
             statusActive: custom.createStatusActiveToString(res.statusactive),

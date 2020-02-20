@@ -50,6 +50,7 @@ router.get('/allWeekend',sheet_weekend.queryAllWeekend)
 
 //-- Holiday Controller
 router.post('/specialHolidayById',sheet_holiday.queryUserSpecialHolidayById)
+router.post('/addcompensateday',sheet_holiday.addCompensateDay)
 
 //-- Config Day Controller
 router.get('/configday',sheet_config.queryConfigDay)

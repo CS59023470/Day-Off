@@ -3,6 +3,7 @@ var creds = require('../config/client_secret.json');
 const { promisify } = require('util');
 const sheet_api = require('../config/googlesheet_api');
 const user_api = require('./userController');
+const custom = require('./customDataController');
 
 //API ค้นหาและลบรายการชดเชยวันหยุดที่เลยกำหนดมาแล้ว
 async function queryUserSpecialHolidayById(req, res) {
@@ -116,7 +117,51 @@ async function decreaseAmountDay(rowDatas) {
     }
 }
 
+// Add Compensate Day
+async function addCompensateDay(req, res) {
+    const doc = new GoogleSpreadsheet(sheet_api.sheetId);
+    await promisify(doc.useServiceAccountAuth)(creds);
+    const info = await promisify(doc.getInfo)();
+    const sheet = info.worksheets[sheet_api.indexSheetSpacialHoliday];
+    const sheetUser = info.worksheets[sheet_api.indexSheetUser];
+    
+
+    let rowData = {
+        rowid: await custom.createRowId(),
+        userid: req.body.data.userid,
+        startdate: req.body.data.startdate,
+        enddate: req.body.data.enddate,
+        amountday: req.body.data.amountday
+    }
+
+    const rowUser = await promisify(sheetUser.getRows)({
+        query: 'userid = ' + rowData.userid
+    });
+
+    let amount = rowData.amountday
+    let specialday = rowUser[0].specialholiday
+    let total = Number(amount) + Number(specialday)
+
+    try {
+        await promisify(sheet.addRow)(rowData);
+        rowUser.forEach(element => {
+            try {
+                element.specialholiday = total
+                element.save()
+                res.send(true)
+            } catch {
+            }
+        })
+    } catch {
+        res.send(false)
+    }
+
+    
+
+}
+
 module.exports = {
     queryUserSpecialHolidayById,
     decreaseAmountDay,
+    addCompensateDay
 };

@@ -142,7 +142,36 @@ async function addCompensateDay(req, res) {
     let specialday = rowUser[0].specialholiday
     let total = Number(amount) + Number(specialday)
 
-    try {
+    if(amount > 1){
+        for(let i = 1 ; i <= amount ; i++){
+            rowData.amountday = 1
+            await promisify(sheet.addRow)(rowData);
+            rowUser.forEach(element => {
+                try {
+                    element.specialholiday = total
+                    element.save()
+                    
+                } catch (err) {
+                    res.send(false)
+                }
+            })
+        }
+    res.send(true)
+    } else {
+            await promisify(sheet.addRow)(rowData);
+            rowUser.forEach(element => {
+                try {
+                    element.specialholiday = total
+                    element.save()
+                    res.send(true)
+                } catch (err) {
+                    res.send(false)
+                }
+            })
+    }
+
+
+    /*try {
         await promisify(sheet.addRow)(rowData);
         rowUser.forEach(element => {
             try {
@@ -154,7 +183,7 @@ async function addCompensateDay(req, res) {
         })
     } catch {
         res.send(false)
-    }
+    }*/
 
     
 

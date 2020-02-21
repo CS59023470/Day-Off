@@ -8,7 +8,7 @@ async function queryAllWeekend(req, res){
     const doc = new GoogleSpreadsheet(sheet_api.sheetId);
     await promisify(doc.useServiceAccountAuth)(creds);
     const info = await promisify(doc.getInfo)();
-    const sheet = info.worksheets[sheet_api.indexSheetCompanyWeekend];
+    const sheet = info.worksheets[sheet_api.indexSheetWeekend];
     const rowDatas = await promisify(sheet.getRows)({
         offset : 1
     });
@@ -17,7 +17,7 @@ async function queryAllWeekend(req, res){
         return {
             day : res.day,
             status : res.status,
-            dayofweek : res.dayofweek,
+            weekday : res.weekday,
         }
     });
     res.send(JSON.stringify(listData));

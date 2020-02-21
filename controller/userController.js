@@ -22,14 +22,14 @@ async function queryAllUser(req, res) {
             name: res.name,
             position: res.position,
             department: res.department,
-            statusUser: custom.createStatusUserToString(res.statususer),
-            statusWorking: custom.createStatusWorkingToString(res.statusworking),
-            statusActive: custom.createStatusActiveToString(res.statusactive),
+            statusUser: custom.createStatusUserToString(res.userstatus),
+            statusWorking: custom.createStatusWorkingToString(res.workingstatus),
+            statusActive: custom.createStatusActiveToString(res.activestatus),
             manager: res.manager,
-            sickday: res.sickdayleft,
-            personalday: res.personaldayleft,
-            vacationday: res.vacationdayleft,
-            specialday: res.specialholiday,
+            sickday: res.sickday,
+            businessday: res.businessday,
+            vacationday: res.vacationday,
+            compensationday: res.compensationday,
         }
     });
 
@@ -54,14 +54,14 @@ async function queryAllUsers(req, res) {
             email: res.email,
             position: res.position,
             department: res.department,
-            statusUser: custom.createStatusUserToString(res.statususer),
-            statusWorking: custom.createStatusWorkingToString(res.statusworking),
-            statusActive: custom.createStatusActiveToString(res.statusactive),
+            statusUser: custom.createStatusUserToString(res.userstatus),
+            statusWorking: custom.createStatusWorkingToString(res.workingstatus),
+            statusActive: custom.createStatusActiveToString(res.activestatus),
             manager: res.manager,
-            sickday: res.sickdayleft,
-            personalday: res.personaldayleft,
-            vacationday: res.vacationdayleft,
-            specialday: res.specialholiday,
+            sickday: res.sickday,
+            businessday: res.businessday,
+            vacationday: res.vacationday,
+            compensationday: res.compensationday,
         }
     });
 
@@ -102,13 +102,13 @@ async function queryDayLeft(req, res) {
 
     let data = data_user.map((res) => {
         let data_day_off = {
-            sickdayleft: Number(res.sickdayleft),
-            personaldayleft: Number(res.personaldayleft),
-            vacationdayleft: Number(res.vacationdayleft),
-            specialholiday: 0,
+            sickday: Number(res.sickday),
+            businessday: Number(res.businessday),
+            vacationday: Number(res.vacationday),
+            compensationday: 0,
         }
-        if (res.specialholiday !== '' && res.specialholiday !== '0') {
-            data_day_off.specialholiday = Number(res.specialholiday)
+        if (res.compensationday !== '' && res.compensationday !== '0') {
+            data_day_off.compensationday = Number(res.compensationday)
         }
         return data_day_off
     });
@@ -170,7 +170,7 @@ async function updateHolidayUserById(userid, holiday_remove) {
     });
 
     rowUsers.forEach(user => {
-        user.specialholiday = user.specialholiday - holiday_remove
+        user.compensationday = user.compensationday - holiday_remove
         user.save()
     });
 
@@ -189,19 +189,19 @@ async function updateDayLeftByUserId(modelData) {
         query: 'userid = ' + modelData.userid
     });
 
-    if (modelData.useSpecialHoliday > 0) {
+    if (modelData.usecompensationday > 0) {
         //Use Special Holiday
-        rowUsers[0].specialholiday = Number(rowUsers[0].specialholiday) - modelData.useSpecialHoliday
+        rowUsers[0].compensationday = Number(rowUsers[0].compensationday) - modelData.usecompensationday
     }
     switch (modelData.type) {
         case 'Personal Leave'://personal leave
-            rowUsers[0].personaldayleft = Number(rowUsers[0].personaldayleft) - modelData.useDayOff
+            rowUsers[0].businessday = Number(rowUsers[0].businessday) - modelData.useDayOff
             break;
         case 'Vacation Leave'://vacation leave
-            rowUsers[0].vacationdayleft = Number(rowUsers[0].vacationdayleft) - modelData.useDayOff
+            rowUsers[0].vacationday = Number(rowUsers[0].vacationday) - modelData.useDayOff
             break;
         case 'Sick Leave'://sick leave
-            rowUsers[0].sickdayleft = Number(rowUsers[0].sickdayleft) - modelData.useDayOff
+            rowUsers[0].sickday = Number(rowUsers[0].sickday) - modelData.useDayOff
             break;
         default: break;
     }
@@ -229,17 +229,17 @@ async function updateDayleaveWhenReject(dataDayleave) {
         rowUsers.forEach(data => {
             switch (dataDayleave.type) {
                 case 'Personal Leave':
-                    data.personaldayleft = Number(data.personaldayleft) + dataDayleave.usedayoff
+                    data.businessday = Number(data.businessday) + dataDayleave.usedayoff
                     break;
                 case 'Sick Leave':
-                    data.sickdayleft = Number(data.sickdayleft) + dataDayleave.usedayoff
+                    data.sickday = Number(data.sickday) + dataDayleave.usedayoff
                     break;
                 case 'Vacation Leave':
-                    data.vacationdayleft = Number(data.vacationdayleft) + dataDayleave.usedayoff
+                    data.vacationday = Number(data.vacationday) + dataDayleave.usedayoff
                     break;
             }
-            if (dataDayleave.usespecialholiday !== 0) {
-                data.specialholiday = Number(data.specialholiday) + dataDayleave.usespecialholiday
+            if (dataDayleave.usecompensationday !== 0) {
+                data.compensationday = Number(data.compensationday) + dataDayleave.usecompensationday
             }
             data.save()
         })

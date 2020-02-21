@@ -22,9 +22,9 @@ async function checkUserLogin(req, res){
             return {
                 userId : res.userid,
                 position : res.position,
-                statusUser : custom.createStatusUserToString(res.statususer),
-                statusWorking : custom.createStatusWorkingToString(res.statusworking),
-                statusActive : custom.createStatusActiveToString(res.statusactive),
+                statusUser : custom.createStatusUserToString(res.userstatus),
+                statusWorking : custom.createStatusWorkingToString(res.workingstatus),
+                statusActive : custom.createStatusActiveToString(res.activestatus),
                 manager : res.manager
             }
         });

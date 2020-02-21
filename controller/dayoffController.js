@@ -8,7 +8,7 @@ async function quryAllDayOff(req, res){
     const doc = new GoogleSpreadsheet(sheet_api.sheetId);
     await promisify(doc.useServiceAccountAuth)(creds);
     const info = await promisify(doc.getInfo)();
-    const sheet = info.worksheets[sheet_api.indexSheetCompanyDayoff];
+    const sheet = info.worksheets[sheet_api.indexSheetHoliday];
 
     let listDate = [];
 
@@ -43,7 +43,7 @@ async function quryAllDayOffForcalendar(req, res){
     const doc = new GoogleSpreadsheet(sheet_api.sheetId);
     await promisify(doc.useServiceAccountAuth)(creds);
     const info = await promisify(doc.getInfo)();
-    const sheet = info.worksheets[sheet_api.indexSheetCompanyDayoff];
+    const sheet = info.worksheets[sheet_api.indexSheetHoliday];
 
     let listDate = [];
 

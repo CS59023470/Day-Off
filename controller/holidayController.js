@@ -10,7 +10,7 @@ async function queryUserSpecialHolidayById(req, res) {
     const doc = new GoogleSpreadsheet(sheet_api.sheetId);
     await promisify(doc.useServiceAccountAuth)(creds);
     const info = await promisify(doc.getInfo)();
-    const sheet = info.worksheets[sheet_api.indexSheetSpacialHoliday];
+    const sheet = info.worksheets[sheet_api.indexSheetCompensationDay];
 
     const rowDatas = await promisify(sheet.getRows)({
         query: 'userid = ' + req.body.data.userid
@@ -68,10 +68,10 @@ async function decreaseAmountDay(rowDatas) {
     const doc = new GoogleSpreadsheet(sheet_api.sheetId);
     await promisify(doc.useServiceAccountAuth)(creds);
     const info = await promisify(doc.getInfo)();
-    const sheet = info.worksheets[sheet_api.indexSheetSpacialHoliday];
+    const sheet = info.worksheets[sheet_api.indexSheetCompensationDay];
 
     const userid = rowDatas.idemployee;
-    let useSpeicalHoliday = rowDatas.use_special_holiday;
+    let useSpeicalHoliday = rowDatas.usecompensationday;
     // console.log("-----------", rowDatas);
     // console.log("userid", userid);
     const row = await promisify(sheet.getRows)({
@@ -117,7 +117,7 @@ async function addCompensateDay(req, res) {
     const doc = new GoogleSpreadsheet(sheet_api.sheetId);
     await promisify(doc.useServiceAccountAuth)(creds);
     const info = await promisify(doc.getInfo)();
-    const sheet = info.worksheets[sheet_api.indexSheetSpacialHoliday];
+    const sheet = info.worksheets[sheet_api.indexSheetCompensationDay];
     const sheetUser = info.worksheets[sheet_api.indexSheetUser];
     
 
@@ -134,8 +134,8 @@ async function addCompensateDay(req, res) {
     });
 
     let amount = rowData.amountday
-    let specialday = rowUser[0].specialholiday
-    let total = Number(amount) + Number(specialday)
+    let compensationday = rowUser[0].compensationday
+    let total = Number(amount) + Number(compensationday)
 
     if(amount > 1){
         for(let i = 1 ; i <= amount ; i++){
@@ -143,7 +143,7 @@ async function addCompensateDay(req, res) {
             await promisify(sheet.addRow)(rowData);
             rowUser.forEach(element => {
                 try {
-                    element.specialholiday = total
+                    element.compensationday = total
                     element.save()
                     
                 } catch (err) {
@@ -156,7 +156,7 @@ async function addCompensateDay(req, res) {
             await promisify(sheet.addRow)(rowData);
             rowUser.forEach(element => {
                 try {
-                    element.specialholiday = total
+                    element.compensationday = total
                     element.save()
                     res.send(true)
                 } catch (err) {

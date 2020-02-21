@@ -27,18 +27,19 @@ async function addLeaveRequest(req, res) {
         status: '',
         totalday: req.body.data.totalDay,
         user: req.body.data.user,
-        admin_approve: '',
-        use_day_off: 0,
-        use_special_holiday: 0
+        AdminApprove: '',
+        UseDayOff: 0,
+        UseCompensationDay: 0
+        //usecompensationday
     }
 
     if (req.body.data.statusHoliday === true) {
         //ใช้วันหยุด
-        row.use_day_off = row.totalday - req.body.data.amountHoliday
-        row.use_special_holiday = req.body.data.amountHoliday
+        row.UseDayOff = row.totalday - req.body.data.amountHoliday
+        row.UseCompensationDay = req.body.data.amountHoliday
     } else {
         //ไม่ใช้วันหยุด
-        row.use_day_off = row.totalday
+        row.UseDayOff = row.totalday
     }
 
     switch (req.body.data.type) {
@@ -89,8 +90,8 @@ async function modifyDayLeftAmount(row) {
     let model = {
         type: row.type,
         userid: row.user.userId,
-        useDayOff: Number(row.use_day_off),
-        useSpecialHoliday: Number(row.use_special_holiday)
+        useDayOff: Number(row.UseDayOff),
+        useCompensationDay: Number(row.UseCompensationDay)
     }
     await user_api.updateDayLeftByUserId(model);
 }
@@ -117,7 +118,7 @@ async function queryAllLeaveRequestNotApprove(req, res) {
             endtime: res.endtime,
             detail: res.detailleave,
             usedayoff: res.usedayoff,
-            usespecialholiday: res.usespecialholiday,
+            usecompensationday: res.usecompensationday,
             user: listUser.find((datauser) => { return datauser.userId === '' + res.idemployee; }),
         }
     });
@@ -178,7 +179,7 @@ async function queryLeaveRequestNotApproveForAdmin(req, res) {
             endtime: res.endtime,
             detail: res.detailleave,
             usedayoff: res.usedayoff,
-            usespecialholiday: res.usespecialholiday,
+            usecompensationday: res.usecompensationday,
             user: listUser.find((datauser) => { return datauser.userId === '' + res.idemployee; }),
         }
     });
@@ -211,7 +212,7 @@ async function queryAllLeaveRequestApprove(req, res) {
             endtime: res.endtime,
             detail: res.detailleave,
             usedayoff: res.usedayoff,
-            usespecialholiday: res.usespecialholiday,
+            usecompensationday: res.usecompensationday,
             user: listUser.find((datauser) => { return datauser.userId === '' + res.idemployee; }),
         }
     });
@@ -272,7 +273,7 @@ async function removeLeaveRequest(req, res) {
                     userid: rowDatas[0].idemployee,
                     type: rowDatas[0].type,
                     usedayoff: Number(rowDatas[0].usedayoff),
-                    usespecialholiday: Number(rowDatas[0].usespecialholiday)
+                    usecompensationday: Number(rowDatas[0].usecompensationday)
                 }
                 let result_update_user = await user_api.updateDayleaveWhenReject(modelRowLeave)
                 if (result_update_user === true) {
@@ -332,7 +333,7 @@ async function updateStatusLeaveRequest(req, res) {
             rowDatas.forEach(element => {
                 try {
                     element.status = 'Approved';
-                    element.admin_approve = '' + manager[0].userid;
+                    element.adminapprove = '' + manager[0].userid;
                     element.save();
                     mail.mailApproved(rowDatas[0], u, m);
                     holiday.decreaseAmountDay(rowDatas[0]);
@@ -395,7 +396,7 @@ async function removeLeaveRequestFormEmail(req, res) {
                     userid: rowDatas[0].idemployee,
                     type: rowDatas[0].type,
                     usedayoff: Number(rowDatas[0].usedayoff),
-                    usespecialholiday: Number(rowDatas[0].usespecialholiday)
+                    usecompensationday: Number(rowDatas[0].usecompensationday)
                 }
     
                 let result_update_user = await user_api.updateDayleaveWhenReject(modelRowLeave)
@@ -455,7 +456,7 @@ async function updateStatusLeaveRequestFromEmail(req, res) {
             if(element.status === "") {
                 try {
                 element.status = 'Approved';
-                element.admin_approve = '' + datamenager[0].userid;
+                element.adminapprove = '' + datamenager[0].userid;
                 element.save();
                 mail.mailApproved(rowDatas[0], u, m);
                 holiday.decreaseAmountDay(rowDatas[0]);
@@ -502,9 +503,9 @@ async function queryHistoryLeaveByMonth(req, res) {
                 detailleave: data.detailleave,
                 status: data.status,
                 totalday: data.totalday,
-                admin_approve: data.admin_approve,
+                adminapprove: data.adminapprove,
                 usedayoff: data.usedayoff,
-                usespecialholiday: data.usespecialholiday,
+                usecompensationday: data.usecompensationday,
                 user: listUser.find((datauser) => { return datauser.userId === '' + data.idemployee; }),
             }
         })
@@ -541,9 +542,9 @@ async function queryHistoryLeaveByMonth(req, res) {
                 detailleave: data.detailleave,
                 status: data.status,
                 totalday: data.totalday,
-                admin_approve: data.admin_approve,
+                adminapprove: data.adminapprove,
                 usedayoff: data.usedayoff,
-                usespecialholiday: data.usespecialholiday,
+                usecompensationday: data.usecompensationday,
                 user: listUser.find((datauser) => { return datauser.userId === '' + data.idemployee; }),
             }
         })
@@ -830,17 +831,17 @@ async function queryForCalendar(req, res) {
             enddate: data.enddate,
             endtime: data.endtime,
             detailleave: data.detailleave,
-            admin_approve: data.admin_approve,
+            adminapprove: data.adminapprove,
             status: data.status,
             totalday: data.totalday,
-            admin_approve: data.adminapprove,
+            adminapprove: data.adminapprove,
             usedayoff: data.usedayoff,
-            usespecialholiday: data.usespecialholiday,
+            usecompensationday: data.usecompensationday,
             user: listUser.find((datauser) => { return datauser.userId === '' + data.idemployee; }),
         }
     })
     result.forEach(re => {
-        let admin = listUser.find((datauser) => { return datauser.userId === '' + re.admin_approve; })
+        let admin = listUser.find((datauser) => { return datauser.userId === '' + re.adminapprove; })
         let modelDateStart = new Date(re.startdate)
         let modelDateEnd = new Date(re.enddate)
         let model = {
@@ -857,7 +858,7 @@ async function queryForCalendar(req, res) {
                 detail: re.detailleave,
                 email: re.user.email,
                 statusWorking: re.user.statusWorking,
-                admin_approve: { name: admin ? admin.name : '', }
+                adminapprove: { name: admin ? admin.name : '', }
             }
         }
         if (re.type === 'Personal Leave') {
@@ -903,7 +904,7 @@ async function queryHistoryLeaveByID(req, res) {
             enddate: data.enddate,
             endtime: data.endtime,
             detailleave: data.detailleave,
-            admin_approve: { name: admin ? admin.name : '', }
+            adminapprove: { name: admin ? admin.name : '', }
         }
         all.push(model)
 
@@ -1061,7 +1062,7 @@ async function queryAllLeaveForReport(req, res) {
             endtime: res.endtime,
             detail: res.detailleave,
             usedayoff: res.usedayoff,
-            usespecialholiday: res.usespecialholiday,
+            usecompensationday: res.usecompensationday,
             user: listUser.find((datauser) => { return datauser.userId === '' + res.idemployee; }),
         }
     });

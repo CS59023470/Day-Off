@@ -30,7 +30,6 @@ async function queryAllUser(req, res) {
             personalday: res.personaldayleft,
             vacationday: res.vacationdayleft,
             specialday: res.specialholiday,
-            image: res.image
         }
     });
 
@@ -63,7 +62,6 @@ async function queryAllUsers(req, res) {
             personalday: res.personaldayleft,
             vacationday: res.vacationdayleft,
             specialday: res.specialholiday,
-            image:  res.image
         }
     });
 

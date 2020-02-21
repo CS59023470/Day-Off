@@ -79,9 +79,6 @@ async function decreaseAmountDay(rowDatas) {
         orderby: 'enddate'
     });
 
-    // console.log("use special holiday", useSpeicalHoliday);
-    // console.log("row", row);
-
     // If the user didn't use special holiday, don't do anything.
     if (useSpeicalHoliday == 0) return;
 
@@ -92,9 +89,7 @@ async function decreaseAmountDay(rowDatas) {
     });
 
     let flag = 0;
-    // console.log("total",total)
-    // console.log("use special holiday", useSpeicalHoliday);
-    // console.log(flag);
+
     for (let i = 0; i < row.length; i++) {
         flag = Number(total) - Number(useSpeicalHoliday)
         if (flag >= 0) {
@@ -169,23 +164,6 @@ async function addCompensateDay(req, res) {
                 }
             })
     }
-
-
-    /*try {
-        await promisify(sheet.addRow)(rowData);
-        rowUser.forEach(element => {
-            try {
-                element.specialholiday = total
-                element.save()
-                res.send(true)
-            } catch {
-            }
-        })
-    } catch {
-        res.send(false)
-    }*/
-
-    
 
 }
 

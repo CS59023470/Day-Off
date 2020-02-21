@@ -1286,7 +1286,4 @@ module.exports = {
     queryLeaveHistory,
     queryAllLeaveForReport,
     querydayByidforCarlendar,
-    queryAllLeaveForReportJustSick,
-    queryAllLeaveForReportJustPersonal,
-    queryAllLeaveForReportJustVacation
 };

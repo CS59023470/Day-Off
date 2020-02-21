@@ -40,9 +40,6 @@ router.get('/queryforcalendar',sheet_leave.queryForCalendar)
 router.post('/historyall',sheet_leave.queryLeaveHistory)
 router.get('/allLeaveForReport',sheet_leave.queryAllLeaveForReport)
 router.post('/querydaybyid',sheet_leave.querydayByidforCarlendar)
-router.get('/allLeaveForReportSick',sheet_leave.queryAllLeaveForReportJustSick)
-router.get('/allLeaveForReportPersonal',sheet_leave.queryAllLeaveForReportJustPersonal)
-router.get('/allLeaveForReportVacation',sheet_leave.queryAllLeaveForReportJustVacation)
 
 
 //queryAllLeaveForReport

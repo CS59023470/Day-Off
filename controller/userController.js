@@ -251,6 +251,44 @@ async function updateDayleaveWhenReject(dataDayleave) {
     }
 }
 
+//API ข้อมูล Filter หน้า Report
+async function getDataFilterForReport(req, res) {
+    const doc = new GoogleSpreadsheet(sheet_api.sheetId);
+    await promisify(doc.useServiceAccountAuth)(creds);
+    const info = await promisify(doc.getInfo)();
+    const sheet = info.worksheets[sheet_api.indexSheetUser];
+    const rowUsers = await promisify(sheet.getRows)({
+        offset: 1
+    });
+
+    const groupDepartment = new Set();
+    rowUsers.forEach((user) => {
+        groupDepartment.add(user.department)
+    });
+    //console.log(groupDepartment)
+    const department_position = []
+    groupDepartment.forEach(department => {
+        let list_user = rowUsers.filter(user => {
+            return user.department === department
+        })
+        let groupPosition = new Set();
+        list_user.forEach(dataFilter => {
+            groupPosition.add(dataFilter.position)
+        })
+        let model = {
+            department: department,
+            position: []
+        }
+        groupPosition.forEach(position => {
+            model.position.push(position)
+        })
+        department_position.push(model)
+    })
+    res.send(JSON.stringify(department_position));
+    //res.send(true)
+
+}
+
 module.exports = {
     queryAllUser,
     queryUserById,
@@ -260,5 +298,6 @@ module.exports = {
     updateHolidayUserById,
     updateDayleaveWhenReject,
     updateDayLeftByUserId,
-    queryAllUsers
+    queryAllUsers,
+    getDataFilterForReport
 };

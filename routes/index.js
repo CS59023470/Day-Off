@@ -22,6 +22,7 @@ router.get('/queryAllUser',sheet_user.queryAllUser)
 router.get('/queryDayLeft/:id',sheet_user.queryDayLeft)
 router.get('/queryAllUserforSearch/',sheet_user.queryAllUserforSearch)
 router.get('/queryUsers',sheet_user.queryAllUsers)
+router.get('/getDataFilterReport',sheet_user.getDataFilterForReport)
 
 //-- Day Off Controller
 router.get('/queryAllDayOff',sheet_day_off.quryAllDayOff)
@@ -39,6 +40,11 @@ router.get('/queryforcalendar',sheet_leave.queryForCalendar)
 router.post('/historyall',sheet_leave.queryLeaveHistory)
 router.get('/allLeaveForReport',sheet_leave.queryAllLeaveForReport)
 router.post('/querydaybyid',sheet_leave.querydayByidforCarlendar)
+router.get('/allLeaveForReportSick',sheet_leave.queryAllLeaveForReportJustSick)
+router.get('/allLeaveForReportPersonal',sheet_leave.queryAllLeaveForReportJustPersonal)
+router.get('/allLeaveForReportVacation',sheet_leave.queryAllLeaveForReportJustVacation)
+
+
 //queryAllLeaveForReport
 
 //-- Email Controller
